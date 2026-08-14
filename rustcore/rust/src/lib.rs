@@ -267,6 +267,7 @@ async fn run_vpn_loop(
     use etherparse::{SlicedPacket, TransportSlice, NetSlice};
     use std::os::unix::io::{FromRawFd};
 
+    // Task: Fix fdsan crash by duplicating the FD.
     let duped_fd = unsafe { libc::dup(fd) };
     if duped_fd < 0 {
         return Err(anyhow::anyhow!("Failed to duplicate TUN fd"));
