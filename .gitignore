@@ -1,3 +1,4 @@
+# Android/IntelliJ
 *.iml
 .gradle
 /local.properties
@@ -13,12 +14,19 @@ build/
 /captures
 .externalNativeBuild
 .cxx
-local.properties
 /test-code*
 .idea/
 agents.md
-AGENT.md**/target/
-rustcore/rust/target/
-app/build/
-rustcore/build/
+AGENT.md
+
+# Rust / Native
 **/target/
+rustcore/rust/target/
+rustcore/build/
+app/build/
+
+# UniFFI Artifacts
+*.dll
+*.so
+*.dylib
+*.exe
