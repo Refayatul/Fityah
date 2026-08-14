@@ -1,7 +1,7 @@
 package com.refayatul.fityah.data.models
 
 enum class DnsType {
-    PLAIN, DOH, DOH3
+    PLAIN, DOH, DOH3, DOT
 }
 
 data class DnsServer(

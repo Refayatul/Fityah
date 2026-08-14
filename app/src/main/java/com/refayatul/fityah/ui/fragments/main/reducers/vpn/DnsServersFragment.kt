@@ -86,15 +86,26 @@ class DnsServersFragment : Fragment() {
             orientation = LinearLayout.VERTICAL
             setPadding(48, 24, 48, 0)
         }
-        val addressInput = EditText(requireContext()).apply { hint = "IP or DoH URL" }
+        val addressInput = EditText(requireContext()).apply { 
+            hint = "e.g. 9.9.9.9 or https://dns.nextdns.io/222jhg" 
+        }
         layout.addView(addressInput)
 
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Add Upstream DNS")
             .setView(layout)
-            .setNeutralButton("DoH3") { _, _ -> addServer(addressInput.text.toString(), DnsType.DOH3) }
-            .setNegativeButton("DoH") { _, _ -> addServer(addressInput.text.toString(), DnsType.DOH) }
-            .setPositiveButton("Plain") { _, _ -> addServer(addressInput.text.toString(), DnsType.PLAIN) }
+            .setNeutralButton("Secure (DoH/DoT)") { _, _ ->
+                val addr = addressInput.text.toString().trim()
+                if (addr.startsWith("https://")) {
+                    addServer(addr, DnsType.DOH)
+                } else {
+                    addServer(addr, DnsType.DOT)
+                }
+            }
+            .setPositiveButton("Plain (IP)") { _, _ -> 
+                addServer(addressInput.text.toString(), DnsType.PLAIN) 
+            }
+            .setNegativeButton("Cancel", null)
             .show()
     }
 
@@ -102,15 +113,15 @@ class DnsServersFragment : Fragment() {
         val addr = address.trim()
         if (addr.isEmpty()) return
 
-        // Task 10: Reject IP-based entries for secure protocols (DoH/DoH3)
-        if ((type == DnsType.DOH || type == DnsType.DOH3) && 
+        // Task 10: Reject IP-based entries for secure protocols (DoH/DoH3/DoT)
+        if ((type == DnsType.DOH || type == DnsType.DOH3 || type == DnsType.DOT) && 
             addr.matches(Regex("^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+$"))) {
-            Toast.makeText(requireContext(), "Secure DNS requires a hostname URL (HTTPS)", Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(), "Secure DNS requires a hostname or URL", Toast.LENGTH_LONG).show()
             return
         }
 
         if ((type == DnsType.DOH || type == DnsType.DOH3) && !addr.startsWith("https://")) {
-            Toast.makeText(requireContext(), "Secure DNS URL must start with https://", Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(), "DoH URL must start with https://", Toast.LENGTH_LONG).show()
             return
         }
 

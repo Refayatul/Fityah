@@ -38,19 +38,24 @@ class UdpDnsProxy(private val service: DnsVpnService) {
     // Custom Dns resolver for OkHttp to bootstrap known DoH providers without loops
     private val bootstrapperDns = object : Dns {
         override fun lookup(hostname: String): List<InetAddress> {
+            // NextDNS uses subdomains for profiles sometimes. Match *.dns.nextdns.io
+            if (hostname == "dns.nextdns.io" || hostname.endsWith(".dns.nextdns.io")) {
+                return listOf(
+                    InetAddress.getByName("45.90.28.231"),
+                    InetAddress.getByName("45.90.30.231")
+                )
+            }
+
             val hardcoded = when (hostname) {
                 "dns.quad9.net" -> "9.9.9.9"
                 "cloudflare-dns.com" -> "1.1.1.1"
                 "dns.google" -> "8.8.8.8"
                 "dns.adguard-dns.com", "family.adguard-dns.com" -> "94.140.14.14"
-                "dns.nextdns.io" -> "45.90.28.0"
                 else -> null
             }
             return if (hardcoded != null) {
                 listOf(InetAddress.getByName(hardcoded))
             } else {
-                // Fallback to system but protect it if possible? 
-                // Actually, just using system is fine as long as we are NOT intercepting the system DNS IPs.
                 Dns.SYSTEM.lookup(hostname)
             }
         }
@@ -89,6 +94,7 @@ class UdpDnsProxy(private val service: DnsVpnService) {
             val result = try {
                 when (server.type) {
                     DnsType.DOH, DnsType.DOH3 -> resolveSecure(query, server.address)
+                    DnsType.DOT -> resolveDot(query, server.address)
                     DnsType.PLAIN -> resolvePlain(query, server.address, socket)
                 }
             } catch (e: Exception) {
@@ -143,6 +149,46 @@ class UdpDnsProxy(private val service: DnsVpnService) {
                 }
             }
         } catch (e: Exception) {
+            null
+        }
+    }
+
+    private suspend fun resolveDot(query: ByteArray, hostname: String): ByteArray? = withContext(Dispatchers.IO) {
+        try {
+            val ips = bootstrapperDns.lookup(hostname)
+            if (ips.isEmpty()) return@withContext null
+            
+            val factory = javax.net.ssl.SSLSocketFactory.getDefault()
+            val socket = factory.createSocket() as javax.net.ssl.SSLSocket
+            service.protect(socket)
+            socket.connect(java.net.InetSocketAddress(ips[0], 853), 3000)
+            socket.startHandshake()
+            socket.soTimeout = 3000
+            
+            val out = socket.outputStream
+            out.write((query.size shr 8).toByte().toInt())
+            out.write((query.size and 0xFF).toByte().toInt())
+            out.write(query)
+            out.flush()
+            
+            val input = socket.inputStream
+            val b1 = input.read()
+            val b2 = input.read()
+            if (b1 == -1 || b2 == -1) return@withContext null
+            val responseLen = (b1 shl 8) or b2
+            
+            val response = ByteArray(responseLen)
+            var totalRead = 0
+            while (totalRead < responseLen) {
+                val r = input.read(response, totalRead, responseLen - totalRead)
+                if (r == -1) break
+                totalRead += r
+            }
+            
+            socket.close()
+            if (totalRead == responseLen) response else null
+        } catch (e: Exception) {
+            Log.e("UdpDnsProxy", "DOT failed for $hostname", e)
             null
         }
     }
