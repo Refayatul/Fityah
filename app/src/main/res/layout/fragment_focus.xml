@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/colorBackground"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/setupContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="12dp">
+
+        <TextView
+            android:id="@+id/tvActiveGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0.7"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/tvMinutes"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/tvMinutes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/coolvetica"
+            android:includeFontPadding="false"
+            android:text="@string/default_focus_duration_value"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="150sp"
+            android:textStyle="bold"
+            app:fontWeight="900"
+            app:layout_constraintBottom_toTopOf="@+id/flRuler"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/tvSeconds"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="@string/label_mins"
+            android:textSize="20sp"
+            app:layout_constraintStart_toEndOf="@+id/tvMinutes"
+            app:layout_constraintTop_toTopOf="@+id/tvMinutes" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_help"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            app:icon="@drawable/baseline_question_mark_24"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_write_focus_nfc"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="@string/focus_nfc_write_title"
+            app:icon="@drawable/baseline_nfc_24"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_help" />
+
+        <ImageButton
+            android:id="@+id/btnGoToStats"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="end"
+            android:layout_marginHorizontal="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/focus_stats"
+            android:src="@drawable/ic_baseline_bar_chart_24"
+            app:layout_constraintBottom_toBottomOf="@+id/btnStartConfig"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/btnStartConfig"
+            app:tint="?attr/colorOnSurface" />
+
+        <FrameLayout
+            android:id="@+id/flRuler"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginBottom="32dp"
+            app:layout_constraintBottom_toTopOf="@+id/btnStartConfig"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvRuler"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:overScrollMode="never" />
+
+            <View
+                android:id="@+id/vSeparator"
+                android:layout_width="3dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:background="?attr/colorPrimary" />
+        </FrameLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnStartConfig"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginBottom="150dp"
+            android:text="@string/focus_start"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btnGoToStats" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>

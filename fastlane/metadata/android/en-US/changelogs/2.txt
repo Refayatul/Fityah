@@ -1,0 +1,8 @@
+- Curbox API: other apps can now ask Curbox to block things, with your approval.
+- Settings change delay, so weakening a block takes time
+- Stronger anti uninstall protection
+- Snapchat spotlight and story blocking
+- Grayscale now use WRITE_SECURE_SETTINGS
+- App language picker, plus Arabic, Chinese, Japanese, Portuguese, Russian
+- Support for Vivaldi, IronFox and Iceraven
+- Many fixes to usage stats, keyword blocker and UI hider scripts

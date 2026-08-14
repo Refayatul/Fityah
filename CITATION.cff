@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+title: Curbox
+message: If you use Curbox in your work, please cite this software.
+type: software
+authors:
+  - name: Nethical
+    orcid: https://orcid.org/0009-0007-6660-2935
+repository-code: https://github.com/curbox-app/curbox-android
+url: https://github.com/curbox-app/curbox-android
+license: GPL-3.0-or-later
+keywords:
+  - screen time management
+  - digital wellbeing
+  - attention span

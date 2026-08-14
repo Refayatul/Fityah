@@ -1,0 +1,25 @@
+// Public Fityah API. Copy this file (keeping the package) to generate the client stub.
+package com.refayatul.fityah.api;
+
+interface IFityahApi {
+    // Version of this contract, so clients can check compatibility.
+    int apiVersion();
+
+    // True when the calling app has been allowed by the user.
+    boolean isGranted();
+
+    // Runs an action. command is one of the names in FityahApiContract (for example
+    // "START_FOCUS"). args carries the parameters that command needs ("target",
+    // "enable", "minutes"). Returns a status string: OK, DENIED, UNKNOWN_COMMAND or FAILED.
+    String execute(String command, in Bundle args);
+
+    // Reads a state. state is one of FOCUS_ACTIVE, SCREENTIME_TODAY or REELS_TODAY.
+    // Returns a JSON object of values, or null when not allowed or the state is unknown.
+    String query(String state);
+
+    // Lists things Fityah knows about, so a client can discover ids before acting on them.
+    // kind is one of FOCUS_GROUPS, APP_BLOCKER_GROUPS, KEYWORD_GROUPS, GRAYSCALE_GROUPS,
+    // AUTO_DND_GROUPS, UI_HIDER_SCRIPTS or STATUS. Returns a JSON array (or object for STATUS),
+    // or null when not allowed or the kind is unknown.
+    String list(String kind);
+}

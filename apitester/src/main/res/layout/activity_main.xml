@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true"
+    android:padding="16dp">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Fityah API Tester"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:paddingBottom="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1) Connect   2) Request permission (allow in Fityah)   3) Run commands"
+                android:paddingBottom="12dp" />
+
+            <Button
+                android:id="@+id/btn_connect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Connect" />
+
+            <Button
+                android:id="@+id/btn_request"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Request permission" />
+
+            <Button
+                android:id="@+id/btn_granted"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Check is granted" />
+
+            <Button
+                android:id="@+id/btn_dump"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Dump everything Fityah knows" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Discover (lists; group lists auto fill target)"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btn_list_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="List status (all toggles)" />
+
+            <Button
+                android:id="@+id/btn_list_focus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="List focus groups" />
+
+            <Button
+                android:id="@+id/btn_list_app"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="List app blocker groups" />
+
+            <Button
+                android:id="@+id/btn_list_keyword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="List keyword groups" />
+
+            <Button
+                android:id="@+id/btn_list_grayscale"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="List grayscale groups" />
+
+            <Button
+                android:id="@+id/btn_list_dnd"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="List auto DND groups" />
+
+            <Button
+                android:id="@+id/btn_list_uihider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="List UI hider scripts" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Parameters"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/field_target"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="target group id (for focus / group commands)"
+                android:inputType="text" />
+
+            <EditText
+                android:id="@+id/field_minutes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="minutes (for start focus)"
+                android:inputType="number"
+                android:text="5" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingVertical="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="enable (for toggle commands)" />
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switch_enable"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Focus"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btn_start_focus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Start focus" />
+
+            <Button
+                android:id="@+id/btn_stop_focus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Stop focus" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Global toggles (use enable switch)"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btn_reel_blocker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Set reel blocker" />
+
+            <Button
+                android:id="@+id/btn_keyword_blocker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Set keyword blocker" />
+
+            <Button
+                android:id="@+id/btn_ui_hider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Set UI hider" />
+
+            <Button
+                android:id="@+id/btn_reel_counter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Set reel counter" />
+
+            <Button
+                android:id="@+id/btn_dnd"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Set Do Not Disturb" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Group toggles (use target + enable switch)"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btn_app_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Set app blocker group" />
+
+            <Button
+                android:id="@+id/btn_keyword_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Set keyword group" />
+
+            <Button
+                android:id="@+id/btn_grayscale_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Set grayscale group" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Queries"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btn_q_focus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Query focus active" />
+
+            <Button
+                android:id="@+id/btn_q_screentime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Query screentime today" />
+
+            <Button
+                android:id="@+id/btn_q_reels"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Query reels today" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingTop="8dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Log"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_clear"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Clear" />
+    </LinearLayout>
+
+    <ScrollView
+        android:id="@+id/log_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#11000000">
+
+        <TextView
+            android:id="@+id/log"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:padding="8dp"
+            android:textSize="12sp" />
+    </ScrollView>
+
+</LinearLayout>

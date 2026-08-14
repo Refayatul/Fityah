@@ -1,0 +1,39 @@
+name: PR Build CI
+
+on:
+  pull_request:
+    branches: [ "kt-rewrite" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4.2.1
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Give permission to executable
+        run: chmod +x gradlew
+
+      - name: Clear build cache
+        uses: gradle/gradle-build-action@v3.1.0
+        with:
+          gradle-version: wrapper
+          arguments: clean
+
+      - name: Build Fdroid Debug APK
+        run: ./gradlew assembleFdroidDebug
+
+      - name: Upload Fdroid Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: fdroid-debug-apk
+          path: app/build/outputs/apk/fdroid/debug

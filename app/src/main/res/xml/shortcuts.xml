@@ -1,0 +1,17 @@
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutDisabledMessage="@string/focus_mode"
+        android:enabled="true"
+        android:icon="@drawable/ic_launcher_foreground"
+        android:shortcutShortLabel="@string/focus_mode"
+        android:shortcutId="fityah_focus_mode_shortcut"
+        android:shortcutLongLabel="@string/focus_mode">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.refayatul.fityah"
+            android:targetClass="com.refayatul.fityah.ui.activity.ShortcutActivity" />
+        <categories android:name="digiipaws" />
+        <capability-binding android:key="actions.intent.CREATE_MESSAGE" />
+    </shortcut>
+    <!-- Specify more shortcuts here. -->
+</shortcuts>

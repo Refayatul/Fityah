@@ -1,0 +1,23 @@
+[package]
+name = "fityah_rust"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+name = "fityah_rust"
+
+[[bin]]
+name = "uniffi-bindgen"
+path = "src/uniffi-bindgen.rs"
+
+[dependencies]
+uniffi = { version = "0.28.0", features = ["cli"] }
+smoltcp = "0.11.0"
+tokio = { version = "1.36", features = ["full"] }
+anyhow = "1.0"
+log = "0.4"
+android_logger = "0.13"
+thiserror = "1.0"
+etherparse = "0.14"
+

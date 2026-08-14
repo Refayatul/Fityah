@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="24dp">
+
+    <RadioGroup
+        android:id="@+id/group_temporary_duration"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:checkedButton="@id/duration_5m">
+
+        <RadioButton
+            android:id="@+id/duration_5m"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/temporary_disable_5m" />
+
+        <RadioButton
+            android:id="@+id/duration_15m"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/temporary_disable_15m" />
+
+        <RadioButton
+            android:id="@+id/duration_1h"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/temporary_disable_1h" />
+
+        <RadioButton
+            android:id="@+id/duration_until_enabled"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/temporary_disable_until_enabled" />
+
+        <RadioButton
+            android:id="@+id/duration_custom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/temporary_disable_custom" />
+    </RadioGroup>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layout_custom_minutes"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="@string/temporary_disable_custom_hint"
+        android:visibility="gone">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/input_custom_minutes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:maxLength="5" />
+    </com.google.android.material.textfield.TextInputLayout>
+</LinearLayout>

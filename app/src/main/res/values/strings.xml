@@ -1,0 +1,1167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="focus_mode">Focus Mode</string>
+    <string name="add">Add</string>
+    <string name="save">Save</string>
+    <string name="write_down_a_keyword">Write down a keyword</string>
+    <string name="warning_message">Warning message</string>
+    <string name="minutes">minutes</string>
+    <string name="app_icon">app_icon</string>
+    <string name="accessibility_permission_app_blocker" translatable="false">
+        This feature needs the Display over other apps permission to work. Please turn that on first, then turn this on. If something stops working, restart the app.\n\n
+        Turning this on lets Fityah do these things for you:\n1. Block apps\n2. Block short form content\n3. Block websites and keywords\n4. Focus Mode\n5. Hide parts of an app\'s screen that distract you\n6. See how long you spend in each app\n7. Count how much short form content you scroll, and show the count in a floating overlay\n8. See which websites you visit and for how long\n\n
+        Fityah needs accessibility access to see which app, website, or screen you are on, so it can block it the way you set and keep your usage stats. Without this, none of it can work.\n\n
+        Fityah never shares anything without your permission.
+        \n\n
+    </string>
+    <string name="admin_permission_desc">Fityah Tamper Protection</string>
+    <string name="close">Close</string>
+    <string name="proceed">Proceed</string>
+    <string name="cancel">Cancel</string>
+    <string name="configure_warning_screen">Warning Screen</string>
+    <string name="proceed_in">Please wait %1$d seconds before pressing proceed</string>
+    <string name="select_all">Select all</string>
+    <string name="clear_all"> Clear all</string>
+    <string name="focus_ready">Ready to focus?</string>
+    <string name="focus_subtitle_minimal">Select duration, then start.</string>
+    <string name="focus_start">Curb Me</string>
+    <string name="focus_create_group">Create Focus Group</string>
+    <string name="focus_active">Focus mode is active</string>
+    <string name="focus_end_session">End Session</string>
+    <string name="focus_group">Focus Group</string>
+    <string name="focus_new_group">Create New Group</string>
+    <string name="focus_stats">Focus Stats</string>
+    <string name="focus_sessions_label">Sessions</string>
+    <string name="focus_total_time_label">Total Time</string>
+    <string name="focus_streak_label">Streak</string>
+    <string name="focus_avg_duration">Avg Session</string>
+    <string name="focus_completion_rate">Completed</string>
+    <string name="focus_top_tags">Top Tags</string>
+    <string name="quick_setup_guide">Quick Setup Guide</string>
+    <string name="fityah_needs_accessibility_permissions_to_help">Fityah needs Accessibility permissions to help you track your screen time. The setup process varies based on how you installed the app.</string>
+    <string name="fdroid_installation">F-Droid Installation</string>
+    <string name="installed_via_fdroid_appnyoure_all_set">✅ Installed via F-Droid app?\nYou\'re all set! Just follow the accessibility setup in the next step.\n\n⚠️ Downloaded from F-Droid website?\nPlease install through the F-Droid app instead to avoid permission issues.</string>
+    <string name="apk_installation">APK Installation</string>
+    <string name="if_you_installed_from_an_apk">If you installed from an APK, follow these steps:\n\n1️⃣ Open Settings → Apps → Fityah\n\n2️⃣ Tap Permissions → Special App Access → Accessibility → Enable Fityah\n\n3️⃣ Return to Fityah App Info → Scroll down → Tap Restricted Settings → Allow\n\n💡 Pro tip: Install via F-Droid app for a smoother setup! 🚀</string>
+    <string name="usage_timeline">Usage Timeline</string>
+    <string name="screentime">Screentime</string>
+    <string name="app_opens">App Opens</string>
+    <string name="add_to_blocked_apps">Add to Blocked Apps</string>
+    <string name="label_empty_dash">-</string>
+    <string name="value_zero">0</string>
+    <string name="label_add_plus">+</string>
+    <string name="screen_time">Screen time</string>
+    <string name="value_zero_time">0h 0m</string>
+    <string name="sample_usage_1h">1h App</string>
+    <string name="reels_today">Reels Today</string>
+    <string name="sample_reels_count">1.3k</string>
+    <string name="sample_percentage_increase">+100%</string>
+    <string name="blocker_tools">Focus Boundaries</string>
+    <string name="app_blocker">Apps</string>
+    <string name="restrict_access_to_distracting_apps">Temporarily mute apps</string>
+    <string name="reels_blocker">Short-Form Video</string>
+    <string name="disable_shortform_video_feeds">Hide short-form videos to help maintain your attention span.</string>
+    <string name="auto_dnd">Auto DND</string>
+    <string name="turn_on_focus_mode_between_set">Automatically turn on Do Not Disturb in your daily schedule.</string>
+    <string name="blocked_keywords">Keywords And Websites</string>
+    <string name="filter_specific_words_across_apps">Keep your digital space peaceful by filtering out specific topics.</string>
+    <string name="stimulation_reducers">Mindful Nudges</string>
+    <string name="on_screen_reminder">Gentle Prompts</string>
+    <string name="put_in_messages_and_counters_floating">Subtle on-screen cues to help you stay anchored in the present.</string>
+    <string name="reel_counter">Short-Form Video Counter</string>
+    <string name="track_the_number_of_reels_consumed">Track and analyze the number of short-form content consumed</string>
+    <string name="grayscale_filter">Grayscale Filter</string>
+    <string name="reduce_visual_stimulation">Reduce visual stimulation</string>
+    <string name="fuel_the_developer">About the Developer ☕</string>
+    <string name="hello_this_is_nethical_the_creator">Hey, I\'m Nethical, the person behind Fityah. I\'m 18, fresh out of high school, and a little obsessed with tech, art, and building cool things from scratch. A while back I went looking for a free app blocker that actually did what I wanted. Nothing came close, so I built my own. Fityah is that app, and I\'ve been pouring into it almost every day for over two years now. So happy you\'re here. I hope it helps you take your time back.</string>
+    <string name="support_the_project">Support the Project ↗</string>
+    <string name="join_the_focus_pack">Join the Focus Pack</string>
+    <string name="dont_fix_your_screen_time_alone">Don\'t fix your screen time alone. Join our Discord of like-minded people holding each other accountable and sharing focus strategies to improve themselves.</string>
+    <string name="join_the_discord">Join the Discord</string>
+    <string name="fityahapp">\@curb.me</string>
+    <string name="follow_fityah">Follow Fityah</string>
+    <string name="label_instagram">Instagram</string>
+    <string name="label_github">GitHub</string>
+    <string name="fityah_github_repo">fityah-android</string>
+    <string name="fityah_also_on">Fityah Also On</string>
+    <string name="label_browser_extension">Browser Extension</string>
+    <string name="fityah_extension_repo">fityah-extension</string>
+    <string name="about_the_developer">About the Developer</string>
+    <string name="view_on_github">View on GitHub ↗</string>
+    <string name="donate_title">Donate</string>
+    <string name="donate_pitch">I\'ve put 1500+ hours into Fityah, building it alongside school, exams and study, to save millions of minutes worldwide. Donate to help me keep it free and growing for everyone.</string>
+    <string name="btn_donate">Donate ❤</string>
+    <string name="cannot_donate_share">Cannot donate? Sharing the project is helpful too!</string>
+    <string name="donate_prompt_title">Can I ask you a favor?</string>
+    <string name="donate_prompt_value">You\'ve been with Fityah for a while now, and that means a lot to me.</string>
+    <string name="donate_prompt_footer">No pressure at all. Fityah stays free for you either way.</string>
+    <string name="donate_prompt_give">I\'ll chip in ❤</string>
+    <string name="donate_prompt_share">I\'ll share it instead</string>
+    <string name="donate_prompt_later">Maybe later</string>
+    <string name="share_fityah_message">I\'ve been using Fityah to take back control of my screen time. It\'s free, give it a try: https://fityah.app</string>
+    <string name="system_diagnostics">System Diagnostics</string>
+    <string name="view_and_share_application_crash_logs">View and share application crash logs to help improve Fityah.</string>
+    <string name="view_crash_logs">View Crash Logs</string>
+    <string name="group_name">Name</string>
+    <string name="group_name_required">Please enter a group name</string>
+    <string name="desc_10_apps_usage_based">10 Apps • Usage Based</string>
+    <string name="no_app_groups_yet_create_one">No App Groups yet. Create one!</string>
+    <string name="create_group">Create Group</string>
+    <string name="apps_to_block">APPS TO BLOCK</string>
+    <string name="select_apps_0">Select Apps (0)</string>
+    <string name="blocking_configuration">BLOCKING CONFIGURATION</string>
+    <string name="group_limits">LIMITS</string>
+    <string name="configure_group_schedule">Active Hours</string>
+    <string name="configure_group_usage">Usage Limit during active hours</string>
+    <string name="configure_reel_count_limit">Configure reel count limit</string>
+    <string name="schedule_section_title">SCHEDULE</string>
+    <string name="schedule_mode_title">Active hours</string>
+    <string name="schedule_mode_all_day">All day</string>
+    <string name="schedule_mode_daily">Daily</string>
+    <string name="schedule_mode_custom">Custom</string>
+    <string name="schedule_summary_all_day">All day, every day</string>
+    <string name="schedule_summary_daily">Daily, %1$s to %2$s</string>
+    <string name="schedule_summary_weekdays">Monday to Friday, %1$s to %2$s</string>
+    <string name="schedule_summary_custom">Custom schedule</string>
+    <string name="schedule_overlap_not_saved">Overlapping time ranges were not saved</string>
+    <string name="schedule_no_room_for_range">No room for another time range</string>
+    <string name="schedule_conflict_title">Schedule conflict</string>
+    <string name="schedule_conflict_item">These apps are also in %2$s during the same time: %1$s. Both rules will apply.</string>
+    <string name="schedule_conflict_edit_apps">Edit apps</string>
+    <string name="schedule_conflict_edit_schedule">Edit schedule</string>
+    <string name="schedule_conflict_keep_both">Keep both</string>
+    <string name="schedule_conflict_edit_group">Edit group</string>
+    <string name="schedule_conflict_cancel">Cancel</string>
+    <string name="warning_section_title">WHEN BLOCK TRIGGERED</string>
+    <string name="select_start_time">Select Start Time</string>
+    <string name="select_end_time">Select End Time</string>
+    <string name="usage_based">Usage Based</string>
+    <string name="time_based">Time Based</string>
+    <string name="configure_settings">Configure Allowed Schedule</string>
+    <string name="configure_warning_screen_1">Configure Warning Screen</string>
+    <string name="link_time_group">Limit to a time group</string>
+    <string name="no_time_group">No time group (all day)</string>
+    <string name="linked_time_group">Time group: %1$s</string>
+    <string name="linked_warning_managed">Warning screen is managed by the linked usage group</string>
+    <string name="done">Done</string>
+    <string name="set_limits_for_each_day">Set limits for each day</string>
+    <string name="hours">Hours</string>
+    <string name="minutes_1">Minutes</string>
+    <string name="its_a_temporary_block_that_appears">It’s a temporary block that appears when your time is up. Instead of just locking you out, it gives you a choice: close the app immediately or &amp;quot;borrow&amp;quot; a few more minutes before the reminder shows up again.</string>
+    <string name="skip_this_screen_and_go_back">Skip this screen and go back immediately</string>
+    <string name="let_me_decide_how_many_extra">Let me decide how many extra minutes I need right then</string>
+    <string name="use_a_predefined_limit_like_5">Use a pre-defined limit, like 5 minutes, every time</string>
+    <string name="show_me_the_warning_screen_but">Show me the warning screen but don\'t let me proceed</string>
+    <string name="how_long_to_unlock_for_after">How long to unlock for after proceeding?</string>
+    <string name="how_long_to_wait_before_being">How long to wait before being able to press the proceed button. Prevents from instantly pressing the button without reading the message.</string>
+    <string name="duration_3_seconds">3 sec</string>
+    <string name="duration_9_seconds">9 sec</string>
+    <string name="duration_15_seconds">15 sec</string>
+    <string name="duration_30_seconds">30 sec</string>
+    <string name="allowed_time_ranges">Allowed Time Ranges</string>
+    <string name="apply_to_every_day">Apply to every day</string>
+    <string name="add_time_range">Add Time Range</string>
+    <string name="save_time_ranges">Save Time Ranges</string>
+    <string name="monday">Monday</string>
+    <string name="sample_start_time">09:00 AM</string>
+    <string name="to">to</string>
+    <string name="sample_end_time">05:00 PM</string>
+    <string name="all_groups">All Groups</string>
+    <string name="value_zero_minutes">0m</string>
+    <string name="value_zero_percent">0%</string>
+    <string name="a_few_final_steps">A few final steps</string>
+    <string name="select_what_apps_youd_like_to">Select what apps you\'d like to get blocked</string>
+    <string name="create_a_new_group">Create a new group</string>
+    <string name="use_a_focus_group_to_instantly">Use a Focus Group to instantly launch a focus session with your chosen apps and websites.</string>
+    <string name="enter_group_name">Enter Group Name</string>
+    <string name="select_apps">Select Apps</string>
+    <string name="selected_0">Selected: 0</string>
+    <string name="what_action_would_you_like_to">Select what happens when you open an app or a website</string>
+    <string name="block_selected">Block Selected</string>
+    <string name="block_all_except_selected">Block All Except Selected</string>
+    <string name="let_me_quit_midsessions">Let me quit mid-sessions</string>
+    <string name="save_group">Save Group</string>
+    <string name="reel_blocker">Reel Blocker</string>
+    <string name="enable_reel_blocker">Enable Reel Blocker</string>
+    <string name="warning_screen">Warning Screen</string>
+    <string name="blocking_basis">Blocking Basis</string>
+    <string name="reel_count_based">Reel Count Based</string>
+    <string name="configure_limits">Configure Limits</string>
+    <string name="reel_limits">Reel Limits</string>
+    <string name="apply_same_limit_to_every_day">Apply same limit to every day</string>
+    <string name="maximum_reels_allowed">Maximum Reels Allowed</string>
+    <string name="save_limits">Save Limits</string>
+    <string name="keyword_blocker">Keyword Blocker</string>
+    <string name="enable_keyword_blocker">Enable Keyword Blocker</string>
+    <string name="enter_a_keyword">Enter a keyword or website</string>
+    <string name="redirection">Redirection</string>
+    <string name="redirection_url">Redirection URL</string>
+    <string name="configuration">Configuration</string>
+    <string name="search_recursively_for_blocked_keywords_on">Search recursively for blocked keywords on every text field on screen</string>
+    <string name="block_all_browsers_except_supported_ones">Block unsupported browser</string>
+    <string name="select_ignored_apps">Select Ignored Apps</string>
+    <string name="activity_powered_by">POWERED BY FITYAH</string>
+    <string name="your_digital_wellbeing">Your Digital Well-being</string>
+    <string name="total_today">TOTAL TODAY</string>
+    <string name="most_used">MOST USED</string>
+    <string name="crunching_numbers">Crunching numbers...</string>
+    <string name="usage_welcome_title">Hello dear user</string>
+    <string name="usage_welcome_message">Your app stats will show up right here. I started keeping track the moment you installed me. Please read the docs so you can use Fityah to its fullest.</string>
+    <string name="usage_welcome_read_docs">Read documentation</string>
+    <string name="usage_welcome_star_repo">Star our repository</string>
+    <string name="whats_new_title">What\'s new</string>
+    <string name="whats_new_dismiss">Got it</string>
+    <string name="no_auto_dnd_groups_yet_create">No Auto DND Groups yet. Create one!</string>
+    <string name="desc_10_apps_included">10 Apps • Included</string>
+    <string name="create_autodnd_group">Create Auto DND Group</string>
+    <string name="apps_to_blockallow">APPS TO BLOCK/ALLOW</string>
+    <string name="blocking_mode">BLOCKING MODE</string>
+    <string name="configure_schedule">Configure Schedule</string>
+    <string name="exitable">Exitable</string>
+    <string name="allow_focus_mode_to_be_exited">Allow focus mode to be exited manually</string>
+    <string name="save_schedule">Save Schedule</string>
+    <string name="track_the_number_of_short_videos">Track the number of short videos you scroll</string>
+    <string name="grayscale_filter_setup">Grayscale Filter Setup</string>
+    <string name="no_grayscale_groups_yet_create_one">No Grayscale Groups yet. Create one!</string>
+    <string name="desc_10_apps">10 Apps</string>
+    <string name="create_grayscale_group">Create Grayscale Group</string>
+    <string name="apps_to_greyscale">APPS TO GREYSCALE</string>
+    <string name="duration_25_minutes">25</string>
+    <string name="duration_15_minutes">15</string>
+    <string name="duration_30_minutes">30</string>
+    <string name="duration_60_minutes">60</string>
+    <string name="duration_120_minutes">120</string>
+    <string name="time_zero">00:00</string>
+    <string name="your_phone_is_designed_to_be">Your
+        phone
+        is
+        designed
+        to be
+        addictive</string>
+    <string name="you_arent_lazy_and_your_willpower">You aren’t lazy, and your willpower isn\'t broken. You\'re just fighting algorithms built by thousands of psychologists to keep you scrolling.</string>
+    <string name="lets_level_the_playing_field">Reduce the load on my willpower.</string>
+    <string name="lets_look_at_the_numbers">Let\'s look at the numbers.</string>
+    <string name="how_many_hours_a_day_do">How much do you scroll a day?</string>
+    <string name="sample_usage_4_hours">4 hrs</string>
+    <string name="over_a_year_that_is_60">That is 1 full week of your life staring at a screen per year.</string>
+    <string name="i_want_my_time_back">I want my time back.</string>
+    <string name="what_are_you_making_room_for">What are you making room for?</string>
+    <string name="mindless_scrolling_leaves_us_with_brain">Mindless scrolling leaves us with brain fog instead of actual rest. What would you rather be doing with those recovered hours?</string>
+    <string name="focusing_on_deep_workstudying">Focusing on deep work/studying</string>
+    <string name="learning_a_new_skill_like_guitar">Learning a new skill (like guitar or coding)</string>
+    <string name="being_present_with_friends_and_family">Being present with friends and family</string>
+    <string name="getting_actual_restful_sleep">Getting actual, restful sleep</string>
+    <string name="commit_to_these_goals">Commit to these goals.</string>
+    <string name="willpower_isnt_enough_we_use_friction">Willpower isn\'t enough. We use friction.</string>
+    <string name="we_dont_just_block_your_apps">We don\'t just block your apps. We interrupt your muscle memory. When you mindlessly tap Instagram or YouTube, we’ll make you pause, take a breath, and actively choose if it\'s worth it.</string>
+    <string name="make_me_pause">Make me pause.</string>
+    <string name="choose_your_first_target">Choose your first target.</string>
+    <string name="dont_try_to_change_everything_at">Don\'t try to change everything at once. Pick one app that drains your energy the most.</string>
+    <string name="instagram">Instagram</string>
+    <string name="tiktok">TikTok</string>
+    <string name="youtube">YouTube</string>
+    <string name="reddit">Reddit</string>
+    <string name="other_select_later">Other (Select later)</string>
+    <string name="daily_limit">Daily Limit</string>
+    <string name="limit_15_min">15 min</string>
+    <string name="limit_30_min">30 min</string>
+    <string name="limit_1_hour">1 hour</string>
+    <string name="limit_2_hours">2 hours</string>
+    <string name="add_friction_to_this_app">Add friction to this app</string>
+    <string name="skip_choosing_a_target_app">I\'ll pick this later</string>
+    <string name="give_us_the_keys">Give us the keys.</string>
+    <string name="to_create_friction_and_give_you">To create friction and give you your time back, we need deep system access.</string>
+    <string name="display_over_other_apps">Display over other apps</string>
+    <string name="usage_access">Usage Access</string>
+    <string name="send_notifications">Send Notifications</string>
+    <string name="app_blocker_accessibility">App Blocker (Accessibility)</string>
+    <string name="do_you_want_to_restore_a">Do you want to restore a previously saved backup? You won\'t be allowed to restore later.</string>
+    <string name="restore_backup">Restore Backup</string>
+    <string name="enable_permissions">Enable Permissions</string>
+    <string name="add_widget_to_homescreen">Add Widget to Homescreen</string>
+    <string name="refresh_usage_stats">Refresh</string>
+    <string name="export_data_as_csv">Export Data as CSV</string>
+    <string name="usage">Usage</string>
+    <string name="focus">Focus</string>
+    <string name="reducers">Reducers</string>
+    <string name="info">Info</string>
+    <string name="settings">Settings</string>
+    <string name="log_in">Log in</string>
+    <string name="sync_across_devices">Sync across my devices</string>
+    <string name="sync_across_devices_pitch">I keep your settings and time stats in step on every phone and browser, locked with a key only you hold.</string>
+    <string name="sync_finish_setup_pitch">You are signed in. One more step turns on sync and unlocks your data on this device.</string>
+    <string name="finish_sync_setup">Finish setup</string>
+    <string name="sync_is_on">Sync is on</string>
+    <string name="sync_is_on_pitch">Your settings and time stats stay in step on every device. Tap to manage sync or sign out.</string>
+    <string name="manage_sync">Manage sync</string>
+    <string name="this_app_is_currently_under_focus">This app is currently under focus mode</string>
+    <string name="blocked_keyword_word_was_found">Blocked keyword -word was found.</string>
+    <string name="please_provide_draw_over_other_apps">Please provide \'Draw over other apps\' permission to make this service work properly. </string>
+    <string name="added_successfully">Added Successfully</string>
+    <string name="package_already_exists">Package already exists</string>
+    <string name="data_exported_successfully">Data exported successfully</string>
+    <string name="failed_to_export_data">Failed to export data</string>
+    <string name="pinning_widgets_is_not_supported_on">Pinning widgets is not supported on this launcher</string>
+    <string name="generating_analysis_csv">Generating Analysis CSV...</string>
+    <string name="crash_logs_cleared">Crash logs cleared</string>
+    <string name="nothing_to_share">Nothing to share.</string>
+    <string name="group_deleted">Group deleted</string>
+    <string name="please_select_at_least_one_app">Please select at least one app</string>
+    <string name="group_saved_successfully">Group saved successfully</string>
+    <string name="warning_link_blocker_may_not_work">WARNING: Link blocker may not work everywhere.</string>
+    <string name="active_reducers">Active Reducers</string>
+    <string name="add_a_reducer">Add a Reducer</string>
+    <string name="mindful_messages">Mindful Messages</string>
+    <string name="enable_mindful_messages">Enable Mindful Messages</string>
+    <string name="target_apps">TARGET APPS</string>
+    <string name="messages_label">MESSAGES</string>
+    <string name="messages_hint">One per line. Variables: {app_usage_today}, {screentime_today}, {live_session_duration}, {reel_count}</string>
+    <string name="overlay_position">OVERLAY POSITION</string>
+    <string name="position_top">Top</string>
+    <string name="position_center">Center</string>
+    <string name="position_bottom">Bottom</string>
+
+    <string name="default_rules">Default Rules</string>
+    <string name="custom_rules">Custom Rules</string>
+    <string name="custom_rule_hint">Custom Rule Hint</string>
+    <string name="pick_element">Pick Element</string>
+
+    <string name="picker_channel_name">Element Picker</string>
+    <string name="picker_channel_description">Notifications for the Element Picker</string>
+    <string name="picker_notification_title">Element Picker Ready</string>
+    <string name="picker_notification_text">Tap to start picking an element</string>
+    <string name="picker_active_title">Element Picker Active</string>
+    <string name="picker_active_text">Tap elements on screen to select them</string>
+
+    <string name="appearance">Appearance</string>
+    <string name="btn_set_position">Set Position</string>
+    <string name="text_size_label">Text Size: 14sp</string>
+    <string name="text_size_value">Text Size: %dsp</string>
+    <string name="background_color">Background Color</string>
+    <string name="opacity_label">Opacity: 37%</string>
+    <string name="opacity_value">Opacity: %d%%</string>
+    <string name="text_opacity_label">Text Opacity: 100%</string>
+    <string name="text_opacity_value">Text Opacity: %d%%</string>
+    <string name="position_label">Position</string>
+    <string name="position_hint">Drag the indicator to set where the overlay appears</string>
+
+    <!-- Extracted Strings -->
+    <string name="dialog_question_mark">?</string>
+    <string name="blocking_service_channel_name">Blocking Service</string>
+    <string name="blocking_service_channel_description">Running in the background to protect you</string>
+    <string name="blocking_service_notification_title">Fityah %1$s is active</string>
+    <string name="blocking_service_notification_text">Protecting your digital wellbeing</string>
+    <string name="picker_no_element_found">No element found at that point</string>
+    <string name="picker_no_element_selected">No element selected</string>
+    <string name="picker_default_text">Text</string>
+    <string name="dialog_title_select_date_range">Select Date Range</string>
+    <string name="dialog_title_select_export_range">Select Export Range</string>
+    <string name="toast_unsupported_browser">Unsupported Browser</string>
+    <string name="notification_title_remaining_usage">Remaining usage before lockdown</string>
+    <string name="notification_title_focus_mode_on">Focus Mode is on</string>
+
+    <string name="nfc_focus_started">Focus started: %1$s (%2$d min)</string>
+    <string name="nfc_focus_stopped">Focus stopped</string>
+    <string name="nfc_focus_no_group">No focus group found to start</string>
+    <string name="nfc_focus_not_exitable">This focus session can\'t be ended early</string>
+    <string name="nfc_tag_unrecognized">Unrecognized Fityah NFC tag</string>
+
+    <string name="onboarding_non_session_title">Non-session based installation detected</string>
+    <string name="onboarding_restricted_settings_desc">Android 13+ restricts Accessibility services for apps installed outside of app stores (like F-Droid or Play Store). To enable permissions, you\'ll need to manually allow \'Restricted settings\' for Fityah. Alternatively, install via the F-Droid app(not website) to avoid this.</string>
+    <string name="onboarding_show_tutorial">Show tutorial to enable permissions</string>
+    <string name="onboarding_shizuku_grant">Grant all permissions with Shizuku</string>
+    <string name="sync_paywall_title">Sync Premium</string>
+    <string name="sync_paywall_subtitle">Keep your Fityah data in step on every device.</string>
+    <string name="sync_paywall_body">Sync your settings, focus sessions, and time stats across browsers and phones. Your data stays end to end encrypted.</string>
+    <string name="sync_paywall_price">%1$s/year</string>
+    <string name="sync_paywall_price_fallback">$25</string>
+    <string name="sync_paywall_subscribe">Subscribe</string>
+    <string name="sync_paywall_restore">I already subscribed</string>
+    <string name="sync_paywall_checking">Checking your subscription</string>
+    <string name="pairing_code_warning_title">Keep this code private</string>
+    <string name="pairing_code_warning_message">This code holds the secret key that unlocks all your synced data. Anyone who snaps a photo of it can read your data. Please do not screenshot or share it. The code hides itself after one minute.</string>
+    <string name="pairing_code_show">Show code</string>
+    <string name="dnd_access_dialog_title">Do Not Disturb</string>
+    <string name="dnd_access_dialog_message">Fityah needs this to turn on Do Not Disturb for you, so it can mute calls and alerts while you focus. Without it, Fityah cannot silence distractions on its own.\n\n🔒 Fityah does not collect, send, or store any of your data on a server without your permission.\n\n🛡️ Fityah respects your peace: It uses this only to mute distractions when you ask it to.</string>
+    <string name="picker_dialog_block_element">Block This Element</string>
+    <string name="picker_dialog_generated_rule">Generated Rule:</string>
+    <string name="picker_dialog_rule_desc">Auto-generated from your selection. Toggle chips below to customize.</string>
+    <string name="picker_dialog_element_properties">⊕ Element Properties</string>
+    <string name="picker_dialog_properties_desc">What identifies this element? Toggle to add/remove from the rule.</string>
+    <string name="picker_dialog_blocking_action">⚡ Blocking Action</string>
+    <string name="picker_dialog_action_desc">What happens when this element is found?</string>
+    <string name="picker_dialog_advanced">⚙ Advanced</string>
+    <string name="picker_dialog_advanced_desc">Fine-tune matching behavior.</string>
+    <string name="picker_dialog_label_optional">💬 Label (optional)</string>
+    <string name="dialog_add_websites">Add Websites</string>
+    <string name="dialog_selected_count">Selected: %1$d</string>
+    <string name="dialog_turn_on_dnd">Turn on do not disturb</string>
+    <string name="reel_blocker_title">Block Short Form Content</string>
+    <string name="reel_blocker_allowed_apps_zero">Allowed apps (0)</string>
+    <string name="reel_blocker_allowed_apps_count">Allowed apps (%1$d)</string>
+    <string name="label_show_more">Show More</string>
+    <string name="label_all_time">All Time</string>
+    <string name="btn_clear_filters">Clear Filters</string>
+    <string name="empty_intents_title">No intents found.</string>
+    <string name="empty_intents_desc">Try adjusting your filters or unlocking an app.</string>
+    <string name="grayscale_shizuku_title">Shizuku Permission Required</string>
+    <string name="grayscale_shizuku_desc">This feature needs Shizuku permission to apply the grayscale filter correctly.</string>
+    <string name="grayscale_secure_settings_desc">Fityah needs a one time permission to change your screen colors. Grant it once with Shizuku. After that grayscale works on its own, even after you restart your phone.</string>
+    <string name="btn_grant_permission">Grant Permission</string>
+    <string name="picker_control_tap_to_select">Tap an element to select it</string>
+    <string name="btn_deeper">Deeper</string>
+    <string name="btn_parent">Parent</string>
+    <string name="btn_block">Block</string>
+    <string name="btn_all">All</string>
+    <string name="btn_move">Move</string>
+    <string name="label_group_name">Group Name</string>
+    <string name="label_app_blocker">App Blocker</string>
+    <string name="default_focus_duration_value">25</string>
+    <string name="label_mins">mins</string>
+    <string name="create_keyword_group_title">Create Keyword Group</string>
+    <string name="label_keywords_to_block">Keywords to block</string>
+    <string name="label_unlock_behavior">Unlock Behavior</string>
+    <string name="label_url_redirection">URL Redirection</string>
+    <string name="label_show_warning_screen">Show Warning Screen</string>
+    <string name="label_keyword_blocker_title">Keyword Blocker</string>
+    <string name="label_no_keyword_groups">No keyword groups yet. Create one!</string>
+    <string name="btn_undo">UNDO</string>
+    <string name="label_loading">Loading </string>
+    <string name="warning_config_title">Warning Screen Configuration</string>
+    <string name="warning_config_desc">Set what happens when your limit is met.</string>
+    <string name="label_fixed_unlock_duration">Fixed Unlock Duration: 5 mins</string>
+    <string name="label_wait_before_unlocking">Wait before unlocking: 15s</string>
+    <string name="label_wait_desc">Forces you to think before bypassing the block.</string>
+    <string name="label_qr_auth">QR/Barcode Authentication</string>
+    <string name="btn_generate_new">Generate New</string>
+    <string name="btn_scan_existing">Scan Existing</string>
+    <string name="label_configured_qr">Configured QR/Barcodes:</string>
+    <string name="label_nfc_auth">NFC Authentication</string>
+    <string name="label_configured_nfc">Configured NFC tags:</string>
+    <string name="label_typing_auth">Typing Authentication</string>
+    <string name="label_typing_desc">Enter the sentence the user must type exactly to bypass the block:</string>
+    <string name="label_intent_auth">Intent unlock length</string>
+    <string name="label_intent_min_desc">I choose how many characters someone must write before they can continue.</string>
+    <plurals name="warning_intent_min_length">
+        <item quantity="one">Minimum character: %1$d</item>
+        <item quantity="other">Minimum characters: %1$d</item>
+    </plurals>
+    <plurals name="warning_intent_chars_needed">
+        <item quantity="one">Write at least %1$d character (%2$d more to go)</item>
+        <item quantity="other">Write at least %1$d characters (%2$d more to go)</item>
+    </plurals>
+    <string name="label_limit_unlock_frequency">Limit unlock frequency</string>
+    <string name="label_allowed_proceeds">Allowed proceeds: 3</string>
+    <string name="label_time_window">Time window: 60 mins</string>
+    <string name="label_vibrate_brightness">Vibrate \u0026 max brightness on warning</string>
+    <string name="label_reducer_analytics">Reducer Analytics</string>
+    <string name="label_logged_intents">Logged Intents</string>
+    <string name="label_logged_intents_desc">Review your past unlock reasons.</string>
+    <string name="label_app_pause">App Pause</string>
+    <string name="label_rather_spend_time">I would rather spend this time ...</string>
+    <string name="label_recommended">Recommended</string>
+    <string name="crash_title">Oops! Fityah has crashed</string>
+    <string name="crash_desc">Something went wrong. Please share these logs with the developer to help fix the issue.</string>
+    <string name="btn_clear">Clear</string>
+    <string name="btn_restart">Restart</string>
+    <string name="btn_share">Share</string>
+    <string name="focus_add_websites_desc">Enter specific websites (e.g., facebook.com/*) or use keywords to block or allow during this focus session.</string>
+    <string name="create_app_group_title">Create App Group</string>
+    <string name="label_on_each_open">On each open</string>
+    <string name="label_configure_allowed_schedule">Configure Allowed Schedule</string>
+
+    <string name="hint_picker_query">pkg:com.app id:btn</string>
+    <string name="hint_picker_label">e.g. Hide Reels, Block Ads...</string>
+    <string name="hint_type_sentence">Type the exact sentence above</string>
+    <string name="hint_unlock_reason">Why do you need to use this app?</string>
+    <string name="hint_search_intents">Search intents or apps...</string>
+    <string name="hint_unlock_challenge">Unlock Challenge</string>
+    <string name="hint_unlock_method">Unlock Method</string>
+    <string name="hint_required_sentence">Required Sentence</string>
+    <string name="hint_custom_warning">Custom Warning Message</string>
+    <string name="hint_add_website">Add website or keyword</string>
+    <string name="desc_previous_week">Previous week</string>
+    <string name="desc_next_week">Next week</string>
+    <string name="desc_edit_group">Edit group</string>
+    <string name="desc_delete_group">Delete group</string>
+    <string name="desc_refresh_stats">Refresh stats</string>
+    <string name="desc_delete">Delete</string>
+    <string name="desc_add_group">Add Group</string>
+    <string name="desc_remove">Remove</string>
+    <string name="desc_remove_interval">Remove interval</string>
+    <string name="learn_more">Learn More</string>
+    <string name="help">Help</string>
+    <string name="more_options">More options</string>
+    <string name="import_keywords">Import Keywords</string>
+    <string name="export_keywords">Export Keywords</string>
+    <string name="download_keyword_list">Download a keyword list</string>
+    <string name="delete_group">Delete Group</string>
+    <string name="advanced">Advanced</string>
+
+    <!-- UIHider -->
+    <string name="delete">Delete</string>
+    <string name="ui_hider_title">UI Hider (scripts)</string>
+    <string name="ui_hider_desc">Write small scripts to analyze an app\'s UI and draw overlays, press back, or press home. Advanced; for users comfortable with simple scripting and android development. \nWe highly recommend you to join our discord to discover and request more scripts.</string>
+    <string name="enable_ui_hider">Enable UI Hider</string>
+    <string name="ui_hider_enable_subtitle">Run your scripts on supported apps</string>
+    <string name="ui_hider_scripts">Scripts</string>
+    <string name="ui_hider_add_script">Add script</string>
+    <string name="ui_hider_editor_title">Edit script</string>
+    <string name="ui_hider_package_hint">App package (e.g. com.instagram.android)</string>
+    <string name="ui_hider_label_hint">Label (optional)</string>
+    <string name="ui_hider_script_label">SCRIPT</string>
+    <string name="ui_hider_source_hint">if app != \"com.instagram.android\" { return }\n…</string>
+    <string name="ui_hider_preset_note">This preset comes with the app. You can read it here and turn it on or off, but you cannot change it.</string>
+
+    <string name="node_picker_start">Start Node Picker</string>
+    <string name="node_picker_channel_name">Node Picker</string>
+    <string name="node_picker_notif_title">Node Picker</string>
+    <string name="node_picker_notif_text">Press to open picker</string>
+    <string name="node_picker_stop">Stop</string>
+    <string name="node_picker_started_hint">I am ready. Open the app you want to look at, then tap my notification to start picking.</string>
+    <string name="node_picker_need_accessibility">Please turn on my accessibility service first.</string>
+    <string name="node_picker_need_overlay">Please let me draw over other apps first.</string>
+    <string name="node_picker_hint">Tap any element on screen to look at it</string>
+    <string name="node_picker_copied">Copied to clipboard</string>
+    <string name="node_picker_up">Up</string>
+    <string name="node_picker_deeper">Deeper</string>
+    <string name="node_picker_move">Move</string>
+    <string name="node_picker_info">Info</string>
+    <string name="node_picker_copy">Copy</string>
+    <string name="node_picker_hide">Hide</string>
+    <string name="node_picker_show">Show panel</string>
+    <string name="node_picker_close">Close</string>
+
+    <string name="terms_consent_title">One quick thing</string>
+    <string name="terms_consent_body">Before you start, please read our Terms and Conditions and Privacy Policy.</string>
+    <string name="terms_consent_footer">Tapping \"I agree\" means you accept both.</string>
+    <string name="terms_consent_terms_link">Read the Terms and Conditions</string>
+    <string name="terms_consent_privacy_link">Read the Privacy Policy</string>
+    <string name="terms_consent_agree">I agree</string>
+    <string name="terms_consent_exit">Not now</string>
+    <string name="terms_url" translatable="false">https://fityah.app/terms.html</string>
+    <string name="privacy_url" translatable="false">https://fityah.app/privacy.html</string>
+
+    <!-- Fityah API -->
+    <string name="label_automation">AUTOMATION</string>
+    <string name="api_screen_title">Fityah API</string>
+    <string name="api_card_subtitle">Let other apps control Fityah</string>
+    <string name="api_screen_subtitle">Other apps can ask to start focus mode, flip blockers, and read your stats. You decide who gets in.</string>
+    <string name="api_enable_title">Allow other apps</string>
+    <string name="api_enable_subtitle">When this is off, no app can control Fityah, even ones you allowed before.</string>
+    <string name="api_connected_title">Connected apps</string>
+    <string name="api_no_apps">No apps are connected. Fityah will ask for your approval when an app requests access, then list approved apps here.</string>
+    <string name="api_revoke">Remove</string>
+    <string name="api_how_title">How it works</string>
+    <string name="api_how_body">When another app requests access, Fityah shows its name and asks for your approval. An approved app can run commands until you remove it. Removing an app ends its access immediately.</string>
+    <string name="api_help_popup">Other apps can ask to control Fityah. You allow or deny each one, and you can remove access any time.</string>
+
+    <!-- Service protection (keep alive) -->
+    <string name="service_protection_title">Keep Fityah running</string>
+    <string name="service_protection_card_subtitle">Help Fityah blockers keep working</string>
+    <string name="service_protection_subtitle">Some phones stop Fityah in the background to save battery. These options help keep its blockers running and restart them if they stop. No option can guarantee that Fityah will always run.</string>
+    <string name="service_protection_master_title">Protection</string>
+    <string name="service_protection_master_desc">Turn on all the layers below</string>
+    <string name="service_protection_status_header">What is working now</string>
+    <string name="service_protection_row_services_title">Fityah blockers</string>
+    <string name="service_protection_services_on">Blockers are running</string>
+    <string name="service_protection_services_off">Blockers are not running</string>
+    <string name="service_protection_row_battery_title">Battery freedom</string>
+    <string name="service_protection_battery_ok">Battery settings allow Fityah to stay active</string>
+    <string name="service_protection_battery_bad">Battery settings may stop Fityah to save power</string>
+    <string name="service_protection_row_autostart_title">Auto start</string>
+    <string name="service_protection_row_autostart_desc">Some phones require a separate setting to let Fityah start automatically. Please allow auto start.</string>
+    <string name="service_protection_row_shizuku_title">Auto repair</string>
+    <string name="service_protection_shizuku_on">Fityah can restart its blockers automatically</string>
+    <string name="service_protection_shizuku_off">Set up Shizuku so Fityah can restart its blockers</string>
+    <string name="service_protection_fix">Fix</string>
+    <string name="service_protection_open">Open</string>
+    <string name="service_protection_setup">Set up</string>
+    <string name="service_protection_shizuku_not_installed">Shizuku is not running. Opening its website.</string>
+    <string name="service_protection_repair_now">Repair now</string>
+    <string name="service_protection_repair_started">Trying to restart Fityah blockers</string>
+    <string name="service_protection_no_screen">This settings screen is not available on this phone</string>
+    <string name="service_protection_autostart_manual">Please open your phone settings and allow Fityah to auto start.</string>
+    <string name="service_protection_advanced_header">Advanced</string>
+    <string name="service_protection_device_owner">Make Fityah a device owner</string>
+    <string name="service_protection_device_owner_warning">This is the strongest option. It stays on even after a force stop and blocks uninstall fully. It only works on a phone with no accounts added, and it is hard to undo later. Only do this if you are sure.</string>
+    <string name="service_protection_cancel">Cancel</string>
+    <string name="service_protection_continue">Continue</string>
+    <string name="service_protection_help_popup">Phones often stop background apps to save battery. This screen helps Fityah stay active with battery access, auto start, regular checks, and optional recovery through Shizuku. These options make Fityah harder to stop, but cannot guarantee that it will always run.</string>
+    <string name="service_protection_channel_name">Service protection</string>
+    <string name="service_protection_down_title">Fityah blockers stopped</string>
+    <string name="service_protection_down_text">Tap to turn them back on so your blocks keep working.</string>
+
+    <!-- Tamper protection -->
+    <string name="anti_uninstall_title">Tamper protection</string>
+    <string name="anti_uninstall_card_subtitle">Make it harder to remove Fityah</string>
+    <string name="anti_uninstall_subtitle">When this is on, Fityah cannot be uninstalled until you turn it off the way you chose. Think of it like a seatbelt for your willpower.</string>
+    <string name="anti_uninstall_limits_warning">This does not make it impossible to uninstall Fityah. It only makes uninstalling more difficult.</string>
+    <string name="anti_uninstall_disable_warning">Fityah keeps itself installed to protect your focus. Turn off tamper protection inside the app first.</string>
+    <string name="anti_uninstall_setup_again">Something went wrong. Please choose your unlock method again.</string>
+    <string name="anti_uninstall_admin_explanation">Fityah uses this to stop itself from being uninstalled while protection is on.</string>
+    <string name="anti_uninstall_admin_needed">This permission is required to keep Fityah installed.</string>
+    <string name="anti_uninstall_help_popup">When this is on, Fityah cannot be uninstalled and its services cannot be switched off until you turn it off using the method you picked: a password, a wait of a few days, or a one day cooldown you can stop anytime.</string>
+
+    <string name="anti_uninstall_status_off_title">Protection is off</string>
+    <string name="anti_uninstall_status_off_body">Fityah can be uninstalled right now.</string>
+    <string name="anti_uninstall_status_on_title">Protection is on</string>
+    <string name="anti_uninstall_status_unlocking_title">Turning off soon</string>
+    <string name="anti_uninstall_status_unlocking_body">Protection turns off in %1$s.</string>
+
+    <string name="anti_uninstall_summary_password">Your password is required to turn off protection.</string>
+    <plurals name="anti_uninstall_summary_timed">
+        <item quantity="one">After you request it, protection turns off in %1$d day.</item>
+        <item quantity="other">After you request it, protection turns off in %1$d days.</item>
+    </plurals>
+    <string name="anti_uninstall_summary_cooldown">A one day wait is required to turn off protection. The request can be cancelled at any time.</string>
+
+    <string name="anti_uninstall_pick_mode">How should protection be turned off?</string>
+    <string name="anti_uninstall_mode_password_title">Password</string>
+    <string name="anti_uninstall_mode_password_desc">Turn off protection immediately with a password.</string>
+    <string name="anti_uninstall_mode_timed_title">Timed</string>
+    <string name="anti_uninstall_mode_timed_desc">Turn off on its own after a set number of days.</string>
+    <string name="anti_uninstall_mode_cooldown_title">One day wait</string>
+    <string name="anti_uninstall_mode_cooldown_desc">Request to turn off protection, then wait one day. The request can be cancelled at any time.</string>
+    <string name="anti_uninstall_days_hint">Days to wait</string>
+    <string name="anti_uninstall_days_error">Enter at least one day.</string>
+
+    <string name="anti_uninstall_turn_on">Turn on protection</string>
+    <string name="anti_uninstall_turn_off">Turn off protection</string>
+    <string name="anti_uninstall_keep_on">Keep protection on</string>
+    <string name="anti_uninstall_turned_on">Protection is on.</string>
+    <string name="anti_uninstall_start">Start</string>
+    <string name="anti_uninstall_cancel">Cancel</string>
+    <string name="anti_uninstall_save">Save</string>
+
+    <string name="anti_uninstall_set_password_title">Set a password</string>
+    <string name="anti_uninstall_enter_password_title">Enter your password</string>
+    <string name="anti_uninstall_password_hint">Password</string>
+    <string name="anti_uninstall_password_confirm_hint">Type it again</string>
+    <string name="anti_uninstall_password_too_short">Pick a password with at least four letters.</string>
+    <string name="anti_uninstall_password_mismatch">The two passwords do not match.</string>
+    <string name="anti_uninstall_wrong_password">That password is wrong.</string>
+
+    <plurals name="anti_uninstall_timed_confirm">
+        <item quantity="one">Protection will turn off on its own in %1$d day. Once the wait starts, it cannot be stopped.</item>
+        <item quantity="other">Protection will turn off on its own in %1$d days. Once the wait starts, it cannot be stopped.</item>
+    </plurals>
+    <string name="anti_uninstall_cooldown_confirm">Protection will turn off in one day. You can stop the wait anytime before then.</string>
+
+    <string name="anti_uninstall_remaining">%1$dh %2$dm %3$ds</string>
+    <string name="anti_uninstall_remaining_with_days">%1$dd %2$dh %3$dm %4$ds</string>
+
+    <!-- Settings change delay -->
+    <string name="change_delay_title">Settings change delay</string>
+    <string name="change_delay_card_subtitle">Weaker settings wait before they apply</string>
+    <string name="change_delay_subtitle">This helps prevent impulsive changes that weaken your rules. Stricter changes apply immediately. Weaker changes wait for the timer and can be cancelled before they apply.</string>
+    <string name="change_delay_master_title">Turn on change delay</string>
+    <string name="change_delay_master_desc">Turning this off or picking a shorter wait also has to wait out the full delay.</string>
+    <string name="change_delay_tamper_lock_title">Also require tamper protection off</string>
+    <string name="change_delay_tamper_lock_desc">Weaker changes stay pending while tamper protection is on, even after the timer ends. Turn off tamper protection to apply them.</string>
+    <string name="change_delay_duration_header">How long do weaker changes wait?</string>
+    <string name="change_delay_none">None</string>
+    <string name="change_delay_10m">10 minutes</string>
+    <string name="change_delay_1h">1 hour</string>
+    <string name="change_delay_4h">4 hours</string>
+    <string name="change_delay_12h">12 hours</string>
+    <string name="change_delay_1d">1 day</string>
+    <string name="change_delay_2d">2 days</string>
+    <string name="change_delay_pending_header">Changes waiting to apply</string>
+    <string name="change_delay_pending_empty">Nothing is waiting right now.</string>
+    <string name="change_delay_applies_in">Starts working in %1$s</string>
+    <string name="change_delay_blocked_by_tamper">Waiting for tamper protection to turn off</string>
+    <string name="change_delay_deferred_toast">Saved for later. This change starts working in %1$s. You can cancel it under Settings change delay.</string>
+    <string name="change_delay_tamper_gated_toast">Saved for later. This change will not apply until tamper protection is off.</string>
+    <string name="change_delay_cancelled_toast">The waiting change was cancelled. Nothing changed.</string>
+    <string name="change_delay_pending_note">If you make a stricter change to the same tool while a change is waiting, the waiting change is removed.</string>
+    <string name="change_delay_help_popup">When enabled, changes that weaken a rule wait before they apply. This gives you time to reconsider them.</string>
+    <string name="change_delay_field_app_groups">App blocker</string>
+    <string name="change_delay_field_auto_dnd">Auto DND</string>
+    <string name="change_delay_field_reel_blocker">Reel blocker</string>
+    <string name="change_delay_field_keyword_blocker">Keyword blocker</string>
+    <string name="change_delay_field_reel_counter">Reel counter</string>
+    <string name="change_delay_field_grayscale">Grayscale</string>
+    <string name="change_delay_field_mindful_messages">Mindful messages</string>
+    <string name="change_delay_field_ui_hider">UI hider</string>
+    <string name="change_delay_field_change_delay">Settings change delay</string>
+    <string name="change_delay_review_title">Hold on</string>
+    <string name="change_delay_review_message">This change weakens the %1$s rules, so it will not apply immediately. It applies in %2$s. The current rules stay active until then.</string>
+    <string name="change_delay_review_message_no_timer">This change weakens the %1$s rules, so it will not apply immediately. The current rules stay active until the change is allowed.</string>
+    <string name="change_delay_review_tamper_note">It will not apply until tamper protection is off.</string>
+    <string name="change_delay_review_replaced_note">A change for this tool was already waiting. This new one takes its place and the timer starts over.</string>
+    <string name="change_delay_review_keep">Keep it waiting</string>
+    <string name="change_delay_review_undo">Undo this change</string>
+    <string name="change_delay_dropped_toast">The stricter change is active. The pending change for %1$s was removed.</string>
+    <string name="temporary_disable_title">Temporarily disable %1$s</string>
+    <string name="temporary_disable_5m">5 minutes</string>
+    <string name="temporary_disable_15m">15 minutes</string>
+    <string name="temporary_disable_1h">1 hour</string>
+    <string name="temporary_disable_until_enabled">Until you turn it back on</string>
+    <string name="temporary_disable_custom">Custom minutes</string>
+    <string name="temporary_disable_custom_hint">Minutes</string>
+    <string name="temporary_disable_action">Disable temporarily</string>
+    <string name="temporary_disable_invalid">Enter a duration from 1 to 43,200 minutes.</string>
+    <string name="temporary_disable_until">Temporarily disabled for %1$s</string>
+    <string name="temporary_disable_until_manually_enabled">Disabled until you turn it back on</string>
+
+    <!-- Fityah API permission screen -->
+    <string name="api_permission_title">Allow access?</string>
+    <string name="api_permission_message">%1$s wants to control Fityah. It can start focus sessions, turn blockers on or off, and read your screen time. You can remove this any time.</string>
+    <string name="api_permission_allow">Allow</string>
+    <string name="api_permission_deny">Deny</string>
+
+    <!-- Common / shared -->
+    <string name="common_back">Back</string>
+    <string name="common_mins">mins</string>
+    <string name="common_continue">Continue</string>
+    <string name="okay">Okay</string>
+    <string name="share">Share</string>
+    <string name="clear">Clear</string>
+    <string name="percent_value">%1$d%%</string>
+    <string name="selected_count">Selected: %1$d</string>
+    <string name="select_apps_count">Select Apps (%1$d)</string>
+    <string name="group_type_time_based">Time Based</string>
+    <string name="group_type_usage_based">Usage Based</string>
+    <string name="group_details_apps">%1$d Apps • %2$s</string>
+    <string name="group_details_keywords">%1$d Keywords • %2$s</string>
+    <string name="group_details_keywords_only">%1$d Keywords</string>
+    <string name="group_details_apps_only">%1$d Apps</string>
+    <string name="group_no_usage_left">No time left in this schedule</string>
+    <string name="group_usage_left">%1$s left in this schedule</string>
+    <string name="warning_show_on_each_open">Show this screen each time I open the selected apps</string>
+    <string name="warning_current_app_session">Current app session</string>
+
+    <!-- Sync account -->
+    <string name="account_sync_title">Sync across my devices</string>
+    <string name="account_sync_desc">I keep your settings and time stats in step on every browser and phone. Everything is locked with a key only you hold, so no one else can read it.</string>
+    <string name="account_hint_email">Email</string>
+    <string name="account_hint_password">Password</string>
+    <string name="account_hint_email_code">Email code</string>
+    <string name="account_hint_new_password">New password</string>
+    <string name="account_hint_secret_phrase">Secret phrase</string>
+    <string name="account_hint_paste_code">Paste pairing code</string>
+    <string name="account_pairing_code_desc">Pairing code</string>
+    <string name="account_sign_in">Sign in</string>
+    <string name="account_forgot_password">Forgot password?</string>
+    <string name="account_new_here">"New here? "</string>
+    <string name="account_create_account">Create an account</string>
+    <string name="account_verify_continue">Verify and continue</string>
+    <string name="account_send_new_code">Send a new code</string>
+    <string name="account_send_reset_code">Send reset code</string>
+    <string name="account_back_to_sign_in">Back to sign in</string>
+    <string name="account_set_new_password">Set new password</string>
+    <string name="account_turn_on_sync">Turn on sync</string>
+    <string name="account_pair_desc">When my other device is handy, this is the easy way. Open Sync there and show its code.</string>
+    <string name="account_scan_code">Scan a code</string>
+    <string name="account_use_pasted_code">Use pasted code</string>
+    <string name="account_show_pairing_code">Show pairing code for another device</string>
+    <string name="account_pairing_warning">Anyone who sees this code can read your data, so only show it to your own devices.</string>
+    <string name="account_sync_now">Sync now</string>
+    <string name="account_sign_out">Sign out of this device</string>
+    <string name="account_device_name">This device</string>
+    <string name="account_save_device_name">Save name</string>
+    <string name="account_what_syncs">WHAT SYNCS</string>
+    <string name="account_sync_usage_stats">Usage stats</string>
+    <string name="account_sync_reducer_configs">Reducer configs</string>
+    <string name="account_usage_shown_from">USAGE SHOWN FROM</string>
+    <string name="account_usage_filter_desc">Choose which other devices contribute to combined usage.</string>
+    <string name="account_all_devices">All devices</string>
+    <string name="account_create_account_action">Create account</string>
+    <string name="account_already_have_account">"Already have an account? "</string>
+    <string name="account_unlock_data">Unlock my data</string>
+    <string name="account_make_secret_phrase">Make a secret phrase</string>
+    <string name="account_title_sync_on">Sync is on</string>
+    <string name="account_title_check_email">Check your email</string>
+    <string name="account_title_reset_password">Reset password</string>
+    <string name="account_title_choose_new_password">Choose a new password</string>
+    <string name="account_title_create_account">Create your account</string>
+    <string name="account_title_welcome_back">Welcome back</string>
+    <string name="account_sub_sync_on">Your settings and time stats stay in step on every device.</string>
+    <string name="account_sub_unlock">Type the secret phrase you made on your first device. Or if that device is nearby, tap Scan a code below to bring this one in without typing anything.</string>
+    <string name="account_sub_make_phrase">This one phrase unlocks your data on every device. I never send it anywhere, so pick something you will remember and keep it safe. If you forget it, your data cannot be opened again.</string>
+    <string name="account_sub_verify">I sent a code to %1$s. Type it below to finish setting up.</string>
+    <string name="account_sub_forgot">Tell me your email and I will send you a code to set a new password.</string>
+    <string name="account_sub_reset">Type the code I emailed you and your new password.</string>
+    <string name="account_sub_sign_up">Make an account so your settings and stats can travel with you.</string>
+    <string name="account_sub_sign_in">Sign in to keep your settings and time stats in step on every device, end to end encrypted.</string>
+    <string name="account_msg_new_code_sent">I sent a new code to %1$s</string>
+    <string name="account_msg_reset_code_sent">I sent a reset code to %1$s</string>
+    <string name="account_msg_phrase_too_short">Please pick a secret phrase with at least 8 letters.</string>
+    <string name="account_msg_phrase_too_long">That secret phrase is too long.</string>
+    <string name="account_err_sync_data_invalid">Some synced data could not be read.</string>
+    <string name="account_msg_syncing">Syncing your latest data now</string>
+    <string name="account_err_generic">Something went wrong. Please try again.</string>
+    <string name="account_err_invalid_login">That email or password did not match. Please try again.</string>
+    <string name="account_err_already_registered">You already have an account with this email. Please sign in instead.</string>
+    <string name="account_err_email_not_confirmed">Please confirm your email first. I can send you a new code.</string>
+    <string name="account_err_bad_code">That code did not work. Check it or ask me for a new one.</string>
+    <string name="account_err_rate_limit">Please wait a moment, then try again.</string>
+    <string name="account_err_weak_password">Please use a password with at least 6 letters or numbers.</string>
+    <string name="account_err_no_network">I cannot reach the internet right now. Check your connection and try again.</string>
+
+    <!-- Language -->
+    <string name="language">Language</string>
+
+    <!-- Info screen -->
+    <string name="info_official_documentation">Official Documentation</string>
+    <string name="crash_logs_title">Crash Logs</string>
+    <string name="crash_logs_none_available">No crash logs available.</string>
+
+    <!-- Onboarding permissions -->
+    <string name="onboarding_app_limit_group_name">%1$s Limits</string>
+    <string name="onboarding_perm_overlay_title">Screen Overlay</string>
+    <string name="onboarding_perm_overlay_rationale">Fityah needs this to show a calm pause screen on top of distracting apps when you open them. Without it, Fityah cannot place anything over those apps to help you stop and think.</string>
+    <string name="onboarding_perm_overlay_opensource">🛡️ Open Source: Think of Fityah like a restaurant with an open kitchen. The whole codebase is public, so anyone can check that Fityah is not doing anything sneaky. There are no closed doors here.</string>
+    <string name="onboarding_perm_notif_title">Notifications</string>
+    <string name="onboarding_perm_notif_rationale">Fityah needs this to stay running in the background so your blocks keep working, and to gently remind you of your goals. Without it, Android can stop Fityah and your blocks may fail.</string>
+    <string name="onboarding_perm_notif_opensource">🛡️ Not a Data Broker: Many apps hide their code because they make money by harvesting your data. Fityah keeps all its code public, so you can check yourself that nothing is quietly sending your information away.</string>
+    <string name="onboarding_perm_accessibility_title">App Blocker (Accessibility API)</string>
+    <string name="onboarding_perm_accessibility_rationale">Fityah needs this to notice when you open a blocked app and show the blocker screen. It also uses it to count your screen time and how many reels you scroll. Without it, Fityah cannot work at all.</string>
+    <string name="onboarding_perm_accessibility_opensource">🛡️ Transparency for Deep Access: This is a powerful permission, which is why being open source matters so much. You do not have to take Fityah at its word. The global community has reviewed its public code and confirmed it only blocks apps and tracks usage.</string>
+    <string name="onboarding_read_documentation">Read Documentation</string>
+    <string name="onboarding_privacy_note">"\n\n🔒 Fityah does not collect, send, or store any of your data on a server without your permission. Everything stays on your phone.\n\n"</string>
+    <string name="onboarding_granting_permissions">Granting Permissions…</string>
+    <string name="onboarding_permissions_granted">Permissions Granted!</string>
+    <string name="onboarding_error_tap_retry">Error, Tap to Retry</string>
+    <string name="onboarding_curb_me">Curb me!</string>
+    <string name="onboarding_need_more_permissions">I still need more permissions</string>
+    <string name="screen_time_hours">%1$d hrs</string>
+    <string name="screen_time_reality">That is %1$d full weeks of your life staring at a screen per year.</string>
+
+    <!-- Focus setup -->
+    <string name="focus_unknown_group">Unknown Group</string>
+    <string name="focus_delete_group_title">Delete Focus Group</string>
+    <string name="focus_delete_group_message">Are you sure you want to delete this group? All associated focus statistics will also be deleted.</string>
+    <string name="focus_no_browser_title">No Browser Selected</string>
+    <string name="focus_no_browser_allow_message">You have set some websites to be allowed, but no supported browser is in your \'Allowed Apps\' list. \n\nTo access these websites, please add a browser (like Chrome or Firefox) to the selected apps.</string>
+    <string name="focus_add_browser">Add Browser</string>
+    <string name="focus_save_anyway">Save Anyway</string>
+    <string name="focus_block_notice_title">Website Blocking Notice</string>
+    <string name="focus_block_notice_message">You have set some websites to be blocked, but no browser is in your \'Blocked Apps\' list. \n\nNote that website blocking only works on supported browsers (like Chrome or Firefox). Any other browser will still be able to access these websites. Consider blocking unsupported browsers if needed.</string>
+    <string name="focus_add_websites_title">Add Websites/Keywords</string>
+
+    <!-- Warning screen config -->
+    <string name="warning_fixed_unlock_duration">Fixed Unlock Duration: %1$d mins</string>
+    <string name="warning_fixed_unlock_duration_lower">Fixed unlock duration: %1$d mins</string>
+    <string name="warning_wait_before_unlock">Wait before unlocking: %1$ds</string>
+    <string name="warning_allowed_proceeds">Allowed proceeds: %1$d</string>
+    <string name="warning_time_window">Time window: %1$d %2$s</string>
+    <string name="warning_fixed_unlock_duration_input">Fixed unlock duration</string>
+    <string name="warning_wait_before_unlock_input">Wait before unlocking</string>
+    <string name="warning_intent_min_length_input">Minimum characters</string>
+    <string name="warning_math_question_count_input">Questions required</string>
+    <string name="warning_math_starting_level_input">Starting level</string>
+    <string name="warning_focus_goal_minutes_input">Required focus time</string>
+    <string name="warning_allowed_proceeds_input">Allowed proceeds</string>
+    <string name="warning_time_window_input">Time window</string>
+    <string name="warning_numeric_value_minimum">Enter %1$d or more.</string>
+    <string name="warning_numeric_value_too_large">This number is too large.</string>
+    <string name="unit_seconds">Seconds</string>
+    <string name="warning_qr_generated_title">QR/Barcode Generated</string>
+    <string name="warning_qr_generated_message">Please save or print this QR/Barcode. You will need it to unlock.</string>
+    <string name="warning_save_to_gallery">Save to Gallery</string>
+    <string name="warning_qr_generate_failed">Failed to generate QR image</string>
+    <string name="warning_saved_to_gallery">Saved to Gallery!</string>
+    <string name="warning_save_image_failed">Failed to save image</string>
+    <string name="warning_mediastore_failed">Failed to create MediaStore entry</string>
+    <string name="warning_qr_timing_title">Unlock Timing</string>
+    <string name="warning_qr_timing_message">Configure the time behavior for this unlock method before continuing.</string>
+    <string name="warning_qr_saved">QR Code Saved Successfully!</string>
+    <string name="warning_scan_cancelled">Scan cancelled</string>
+    <string name="warning_cancelled">Cancelled</string>
+    <string name="warning_invalid_qr">Invalid QR Code - Pattern does not match</string>
+    <string name="warning_proceed_limit_reached">Proceed limit of %1$d per %2$d minutes has been reached. Try again in %3$d minutes.</string>
+    <string name="warning_proceeds_left">You have %1$d of %2$d opens left</string>
+    <string name="warning_typing_quote">\"%1$s\"</string>
+    <string name="warning_scan_qr_code">Scan QR Code</string>
+    <string name="warning_scan_nfc_tag">Scan NFC Tag</string>
+    <string name="warning_math_problem">Solve %1$s</string>
+    <string name="warning_math_progress">%1$d of %2$d solved</string>
+    <string name="warning_math_answer_hint">Answer</string>
+    <string name="warning_math_check_answer">Check answer</string>
+    <string name="warning_math_answer_required">Enter a number</string>
+    <string name="warning_math_incorrect">Incorrect answer. Try the next question.</string>
+    <string name="warning_option_never_unlock">Never Unlock</string>
+    <string name="warning_option_never_unlock_desc">Total lockdown. No bypassing allowed.</string>
+    <string name="warning_option_require_effort">Require effort to unlock</string>
+    <string name="warning_option_require_effort_desc">In behavioral psychology, adding physical friction breaks the automatic habit loop, giving your brain a necessary pause to reconsider.</string>
+    <string name="warning_option_wait">Wait to unlock</string>
+    <string name="warning_option_wait_desc">Allows immediate access after a short wait.</string>
+    <string name="warning_option_qr">Unlock requires QR/Barcode scanning</string>
+    <string name="warning_option_qr_desc">Scan any code (like a product box) to unlock.</string>
+    <string name="warning_option_typing">Unlock requires typing a sentence</string>
+    <string name="warning_option_typing_desc">Precisely type a long sentence to prove focus.</string>
+    <string name="warning_option_intent">Unlock requires stating an intent</string>
+    <string name="warning_option_intent_desc">Briefly describe your goal before accessing.</string>
+    <string name="warning_option_nfc">Unlock requires scanning an NFC tag</string>
+    <string name="warning_option_nfc_desc">Tap a physical NFC tag to unlock.</string>
+    <string name="warning_option_adaptive_math">Adaptive math</string>
+    <string name="warning_option_adaptive_math_desc">Solve questions with adaptive difficulty.</string>
+    <string name="label_adaptive_math">Adaptive math</string>
+    <string name="label_adaptive_math_desc">Choose how many correct answers are required.</string>
+    <string name="warning_math_starting_level">Starting level: %1$d</string>
+    <string name="label_adaptive_math_level_desc">Level 1 uses simple arithmetic. Level 10 combines decimals, fractions, roots, powers, and order of operations.</string>
+    <plurals name="warning_math_question_count">
+        <item quantity="one">Question required: %1$d</item>
+        <item quantity="other">Questions required: %1$d</item>
+    </plurals>
+    <string name="label_focus_goal_unlock">Daily focus requirement</string>
+    <string name="label_focus_goal_unlock_desc">Unlocking is allowed after the selected focus time is completed today.</string>
+    <string name="hint_focus_group">Focus group</string>
+    <string name="warning_focus_goal_group_required">Select a focus group</string>
+    <plurals name="warning_focus_goal_minutes">
+        <item quantity="one">Required focus time: %1$d minute</item>
+        <item quantity="other">Required focus time: %1$d minutes</item>
+    </plurals>
+    <string name="warning_focus_goal_checking">Checking focus progress</string>
+    <string name="warning_focus_goal_complete">Focus goal complete for %1$s.</string>
+    <string name="warning_focus_goal_not_met">Focus goal not met. %1$d minutes remaining for %2$s.</string>
+    <string name="warning_focus_goal_unavailable">The selected focus group is unavailable. Unlocking is restricted.</string>
+    <string name="warning_focus_goal_check_failed">Focus progress could not be checked. Unlocking is restricted.</string>
+    <string name="warning_option_choose_time">Ask me how much time I need</string>
+    <string name="warning_option_choose_time_desc">You choose the duration during each unlock.</string>
+    <string name="warning_option_fixed_time">Only give me a fixed amount of time</string>
+    <string name="warning_option_fixed_time_desc">Automatically locks after a set duration.</string>
+    <string name="warning_invalid_nfc">This NFC tag is not registered</string>
+    <string name="nfc_tap_title">Tap your NFC tag</string>
+    <string name="nfc_tap_message">Hold your NFC tag against the back of your phone.</string>
+    <string name="nfc_unavailable">NFC is off or unavailable on this device</string>
+    <string name="nfc_tag_saved">NFC tag registered</string>
+    <string name="nfc_write_failed">Could not write to tag. Use a writable NFC tag.</string>
+    <string name="nfc_write_success">Tag written and registered</string>
+    <string name="nfc_already_registered">That tag is already registered</string>
+    <string name="focus_nfc_write_title">Write Focus NFC Tag</string>
+    <string name="focus_nfc_write_button">Write Tag</string>
+    <string name="focus_nfc_no_groups">Create a focus group first</string>
+    <string name="focus_nfc_pick_group">Focus group</string>
+    <string name="focus_nfc_pick_action">When tapped</string>
+    <string name="focus_nfc_unnamed_group">Unnamed group</string>
+    <string name="focus_nfc_action_toggle">Toggle focus</string>
+    <string name="focus_nfc_action_start">Start focus</string>
+    <string name="focus_nfc_action_stop">Stop focus</string>
+    <string name="focus_nfc_duration_input_hint">Duration</string>
+    <string name="focus_nfc_load_button">Load from tag</string>
+    <string name="focus_nfc_load_title">Tap a tag to load</string>
+    <string name="focus_nfc_loaded">Loaded values from tag</string>
+    <string name="focus_nfc_load_invalid">That tag is not a Fityah focus tag</string>
+
+    <!-- Group edit titles -->
+    <string name="app_group_edit_title">Edit App Group</string>
+    <string name="grayscale_group_edit_title">Edit Grayscale Group</string>
+    <string name="autodnd_group_edit_title">Edit Auto DND Group</string>
+    <string name="keyword_group_edit_title">Edit Keyword Group</string>
+    <string name="autodnd_scheduled">Scheduled</string>
+
+    <!-- Keyword import/export -->
+    <string name="keyword_imported_count">Imported %1$d keywords</string>
+    <string name="keyword_no_new_import">No new keywords to import</string>
+    <string name="keyword_import_failed">Failed to import keywords</string>
+    <string name="keyword_export_success">Keywords exported successfully</string>
+    <string name="keyword_export_failed">Failed to export keywords</string>
+    <string name="keyword_add_at_least_one">Add at least one keyword</string>
+
+    <!-- Settings toasts -->
+    <string name="usage_disable_everyday_granular">Disable everyday to add granular changes</string>
+    <string name="time_disable_everyday_granular">Disable everyday to set granular ranges</string>
+    <string name="time_overnight_split">Overnight range split into two (up to midnight and from midnight)</string>
+    <string name="uihider_enter_package">Enter a package name</string>
+
+    <!-- Intents log -->
+    <string name="intent_unlocked_for">Unlocked for %1$d mins</string>
+
+    <!-- Usage screen -->
+    <string name="usage_export_daily_breakdown">Daily Breakdown (Time Series)</string>
+    <string name="usage_export_total_summary">Total Summary</string>
+    <string name="usage_export_both">Both</string>
+    <string name="usage_export_format_title">Select Data Format</string>
+    <string name="usage_widget_screentime">Screentime Stats</string>
+    <string name="usage_widget_reels">Reels Stats</string>
+    <string name="usage_short_form_videos_scrolled">Short form videos scrolled • %1$d</string>
+    <string name="usage_short_form_video_duration">Duration • %1$s</string>
+    <string name="usage_short_form_video_average_attention">Average attention span • %1$s</string>
+    <string name="usage_widget_pin_title">Select Widget to Pin</string>
+    <string name="usage_ignore_title">Add to ignored packages?</string>
+    <string name="usage_ignore_message">This action will cause the tracker to not display any stats from this app.</string>
+    <string name="rule_type_app_blocker">App Blocker</string>
+    <string name="rule_type_grayscale">Grayscale</string>
+    <string name="create_new_rule_title">Create New Rule</string>
+    <string name="synced_browsing">Synced browsing</string>
+    <string name="synced_other_devices">OTHER DEVICES</string>
+
+    <!-- Select apps -->
+    <string name="app_category_audio">Audio</string>
+    <string name="app_category_games">Games</string>
+    <string name="app_category_images">Images</string>
+    <string name="app_category_maps">Maps</string>
+    <string name="app_category_news">News</string>
+    <string name="app_category_productivity">Productivity</string>
+    <string name="app_category_social">Social</string>
+    <string name="app_category_video">Video</string>
+    <string name="app_category_undefined">Undefined</string>
+    <string name="select_apps_auto_select">Auto Select %1$s</string>
+    <string name="select_apps_category_fallback">Category %1$d</string>
+    <string name="select_apps_add_custom_menu">Add a custom android package</string>
+    <string name="select_apps_import_from_group">── Import from Group ──</string>
+    <string name="select_apps_custom_hint">com.real.android.app</string>
+    <string name="select_apps_add_custom_title">Add a custom package</string>
+
+    <!-- Service notifications -->
+    <string name="notification_remaining_usage_lockdown">Remaining usage before lockdown</string>
+    <string name="notification_remaining_usage_reels_lockdown">Remaining usage before reels lockdown</string>
+    <string name="usage_tracking_settings">Usage tracking</string>
+    <string name="usage_tracking_settings_description">Choose which usage data the accessibility service saves on this device.</string>
+    <string name="app_usage_tracking">App Usage Tracking</string>
+    <string name="website_usage_tracking">Website Usage Tracking</string>
+    <string name="usage_tracking_disabled_warning">Warning: Usage Based blocking options will not work for a tracking type while it is turned off.</string>
+
+    <!-- Units -->
+    <string name="unit_minutes">Minutes</string>
+    <string name="unit_hours">Hours</string>
+    <string name="unit_days">Days</string>
+
+    <!-- VPN / DNS Filter -->
+    <string name="vpn_title">DNS Filter (VPN)</string>
+    <string name="vpn_desc">On-device DNS blocking &amp; Custom DNS</string>
+    <string name="vpn_enable">Enable DNS Filter</string>
+    <string name="vpn_dns_server">Custom DNS Server</string>
+    <string name="vpn_local_blocklist">Local Blocklist</string>
+    <string name="vpn_local_blocklist_desc">Block domains locally using subscribed lists</string>
+    <string name="vpn_safesearch">Forced SafeSearch</string>
+    <string name="vpn_safesearch_desc">Force SafeSearch on Google, Bing, and DuckDuckGo</string>
+    <string name="vpn_allowlist">Allowlist</string>
+    <string name="vpn_allowlist_desc">Manually allow specific domains</string>
+    <string name="vpn_refresh_blocklists">Refresh Blocklists</string>
+    <string name="vpn_add_source">Add Blocklist URL</string>
+
+    <!-- Friction Overlay -->
+    <string name="friction_title" translatable="false">Tamper Protection Active</string>
+    <string name="friction_msg" translatable="false">Fityah is protected to keep your focus boundaries intact. Please return to the app.</string>
+    <string name="friction_back" translatable="false">Go Back</string>
+    <string name="friction_back_countdown" translatable="false">Go Back (%1$ds)</string>
+
+    <!-- Trusted Contact -->
+    <string name="trusted_contact_title">Trusted Contact</string>
+    <string name="trusted_contact_desc">Designate a person you trust (friend, parent, or partner) to approve your emergency unlocks. When you are stuck, you will need a code from them to proceed.</string>
+    <string name="trusted_contact_name_hint">Contact Name</string>
+    <string name="trusted_contact_email_hint">Contact Email (Optional)</string>
+    <string name="trusted_contact_how_title">How to unlock?</string>
+    <string name="trusted_contact_how_steps">1. Open a blocked app.\n2. Tap \'Request Approval\'.\n3. Send the 6-digit \'Challenge Code\' to your contact.\n4. They use the Fityah Guardian tool to generate your \'Unlock Code\'.\n5. Enter their code to bypass the block.</string>
+    <string name="trusted_contact_require_toggle">Require Trusted Contact Approval</string>
+    <string name="trusted_contact_challenge_label">Challenge Code: %1$s</string>
+    <string name="trusted_contact_unlock_hint">Enter Unlock Code</string>
+    <string name="trusted_contact_share_msg">Fityah Challenge Code: %1$s. Please provide me the unlock code.</string>
+    <string name="trusted_contact_invalid_code">Invalid Code</string>
+    <string name="trusted_contact_not_set_error" translatable="false">Set a Trusted Contact first in Reducers > Advanced</string>
+
+    <!-- ASCII Art (Internal) -->
+    <string name="ascii_star1" translatable="false">
+        \n        *
+        \n       / \\
+        \n      *   *
+        \n       \\ /
+        \n        *
+    </string>
+    <string name="ascii_star2" translatable="false">
+        \n       .
+        \n      / \\
+        \n    -  *  -
+        \n      \\ /
+        \n       \'
+    </string>
+    <string name="ascii_star3" translatable="false">
+        \n       +
+        \n      + +
+        \n       +
+    </string>
+    <string name="ascii_star4" translatable="false">
+        \n       x
+    </string>
+    <string name="ascii_star5" translatable="false">
+        \n       .
+    </string>
+    <string name="ascii_kitty" translatable="false">
+        \n      |\\__/,|   (`\\
+        \n    _.|o o  |_   ) )
+        \n  -(((---(((--------
+    </string>
+    <string name="ascii_coolstars" translatable="false">
+        \n     .  .
+        \n      \\/
+        \n     -*-
+        \n      /\\
+        \n     \'  \'
+    </string>
+    <string name="ascii_coolflower" translatable="false">
+        \n      _ _
+        \n     (   )
+        \n    (  o  )
+        \n     ( _ )
+    </string>
+    <string name="ascii_chillguy" translatable="false">
+        \n      (^_^)
+        \n     &lt;| |&gt;
+        \n      / \\
+    </string>
+    <string name="ascii_god" translatable="false">
+        \n      ( O )
+        \n     /  |  \\
+    </string>
+    <string name="ascii_jellyfish" translatable="false">
+        \n      .---.
+        \n     (     )
+        \n      | | |
+        \n      \' \' \'
+    </string>
+    <string name="ascii_lotus" translatable="false">
+        \n       \\|/
+        \n      --*--
+        \n       /|\\
+    </string>
+    <string name="ascii_sharks" translatable="false">
+        \n      __
+        \n     /  \\
+        \n    &lt; o  &gt;
+        \n     \\__/
+    </string>
+    <string name="ascii_hello" translatable="false">
+        \n   _   _  _   _
+        \n  | |_| || | | |
+        \n  |  _  || |_| |
+        \n  |_| |_| \\___/
+    </string>
+    <string name="ascii_meditate" translatable="false">
+        \n        _
+        \n      _( )_
+        \n     (_ o _)
+        \n      /   \\
+    </string>
+    <string name="ascii_brain" translatable="false">
+        \n      _---~~---_
+        \n    /            \\
+        \n    |  O      O  |
+        \n    \\    __    /
+        \n      ~--__--~
+    </string>
+    <string name="ascii_key" translatable="false">
+        \n     .--.
+        \n    /    \\
+        \n    |    |
+        \n     \'--\'
+        \n      ||
+        \n      ||--.
+        \n      ||--\'
+        \n      ||
+    </string>
+    <string name="ascii_pill" translatable="false">
+        \n     .-----.
+        \n    /       \\
+        \n    |       |
+        \n    \'-----\'
+    </string>
+    <string name="ascii_aim" translatable="false">
+        \n       ( )
+        \n      --+--
+        \n       ( )
+    </string>
+</resources>

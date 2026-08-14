@@ -1,0 +1,25 @@
+Action Required: Update Your Blocker Configurations. We have made foundational changes to how all three blockers (app, website, and short-form) operate. As a result, your existing configurations may no longer work as expected.
+We highly advise reviewing and updating your settings. Additionally, you will need to reconfigure both Tamper Protection and the Settings Change Delay.
+We apologize for any inconvenience this may cause!
+
+Please read the docs for app, wesbite, and shortform blockers at curbox.app/docs to understand the changes :)
+
+NEW:
+• Tack attention span on short form videos and block them on basis of usage
+• Add NFC tags as a warning screen unlock method and use programmable NFC tags to control Focus Mode @PhantomOffKanagawa
+• Add adaptive math as warning screen unlock methods
+• Connect warning screen with focus mode (for example, do not allow unlocks if user hasn't focused for an hour)
+• Add tiktok global support to reel counter
+• Add Instagram Lite reel blocking and Pinterest home feed hiding
+• Temporarily turn off groups for a chosen duration
+
+IMPROVEMENTS:
+• Choose seconds, minutes, or hours for the warning screen proceed window @binayshaw7777
+• Add contextual subtree text and regular expression matching to UI Hider scripts @neverfap-akademi
+• Fix Instagram home feed hiding after stories scroll out of view @aritra-tech
+• Add multiple active hour schedules for the same apps and link usage limits to a schedule
+• Improve App Pause and Keyword Blocker setup, schedule handling, and warning screens
+• Fix reel blocking and counting on Instagram, Facebook, and Snapchat
+• There are no upper limits in focus mode or warning configurations anymore
+
+

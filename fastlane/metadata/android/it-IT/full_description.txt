@@ -1,0 +1,55 @@
+Curbox (Digipaws) è un blocco app e monitoraggio del tempo di utilizzo gratuito e open source, pensato per il benessere digitale e un vero detox digitale. Come blocco app ti permette di bloccare app, siti, reels e shorts, così vedi calare il tuo tempo di utilizzo e torni a concentrarti.
+
+<b>Blocca app e siti</b>
+
+• <b>Blocco app e siti</b>: blocca del tutto qualsiasi app o sito che ti distrae
+• <b>Blocco per percorso URL</b>: blocca solo una parte di un sito, come m.youtube.com/shorts, mentre il resto di YouTube continua a funzionare
+• <b>Blocco dei contenuti brevi</b>: spegni i Reels di Instagram e gli Shorts di YouTube così il feed smette di richiamarti
+• <b>Protezione anti manomissione</b>: rende difficile disinstallare Curbox o cambiare le impostazioni
+• <b>Ritardo delle modifiche alle impostazioni</b>: ritarda le modifiche che indeboliscono le regole, dandoti tempo per ripensarci
+
+<b>Nascondi solo le parti che distraggono</b>
+
+Il nascondimento preciso dell'interfaccia ti fa togliere la trappola dentro un'app senza perdere l'app. Curbox stende uno strato pulito sull'area esatta che scegli, così tutto il resto continua a funzionare. Per esempio, nascondi il feed home di YouTube ma tieni la ricerca, oscura la scheda esplora di Instagram, o l'intero feed home lasciando vedere i post degli amici. Sei tu a decidere cosa vedi.
+
+
+<b>Resta concentrato</b>
+
+• <b>Modalità Focus</b>: metti in pausa app e siti per un tempo stabilito così studi o lavori in pace
+• <b>Non disturbare programmato</b>: attiva Non disturbare in automatico agli orari che imposti
+• <b>Scala di grigi per app</b>: togli il colore a Instagram mentre la Fotocamera resta a colori pieni, così le app noiose perdono attrattiva
+• <b>Limiti d'uso</b>: blocca un'app o un sito dopo un certo tempo d'uso, come WhatsApp dopo 1 ora
+• <b>Accesso per orario</b>: consenti un'app solo in certe ore, come WhatsApp dalle 7 alle 21
+• <b>Messaggi consapevoli</b>: piccoli richiami che appaiono come strato quando usi un'app
+• <b>Monitoraggio dell'attenzione</b>: scopri quanto a lungo resti attento ai video brevi prima di passare oltre
+
+
+<b>Guarda il tuo tempo</b>
+
+• <b>Analisi d'uso</b>: dettagli chiari su quanto tempo passi in ogni app e sito
+• <b>Statistiche di focus</b>: segui le tue sessioni di focus e i tuoi progressi nel tempo
+• <b>Contatore di scroll dal vivo</b>: un conteggio in tempo reale di quanti video brevi hai scorso
+• <b>Timer di sessione</b>: un cronometro dal vivo del tempo passato nell'app attuale
+• <b>Widget schermata home</b>: tieni statistiche e controlli rapidi sulla schermata home
+
+
+<b>Scegli quanto è difficile cedere</b>
+
+Quando provi ad aprire qualcosa fuori dal suo orario, decidi tu cosa serve per rientrare.
+
+• <b>Blocco rigido</b>: nessun accesso
+• <b>Sblocchi a tempo</b>: ogni sblocco dura un breve tempo fisso, come 5 minuti
+• <b>Sblocchi dinamici</b>: scegli tu la durata ogni volta
+• <b>Sblocco con QR o codice a barre</b>: scansiona un codice reale, come quello su un libro, così devi alzarti e muoverti
+• <b>Riscrittura di una frase</b>: scrivi una frase intera prima che l'app si apra
+• <b>Limiti di sblocco</b>: limita quanti sblocchi hai ogni poche ore
+• <b>Sblocco NFC</b>: usa un tag NFC fisico per rendere lo sblocco una scelta consapevole
+• <b>Matematica adattiva</b>: risolvi una sfida matematica che cambia prima di sbloccare
+
+
+<b>Per gli sviluppatori</b>
+
+L'<b>API di Curbox</b> permette alle app autorizzate di avviare la Modalità Focus, cambiare le impostazioni di Curbox e leggere le statistiche d'uso. Sei tu a decidere quali app ricevono l'accesso.
+
+
+Curbox è il blocco app per chi vuole bloccare app e siti che distraggono, ridurre il tempo di utilizzo e riprendersi la concentrazione. Gratis, open source, senza pubblicità.

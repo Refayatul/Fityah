@@ -1,0 +1,44 @@
+package com.refayatul.fityah.ui.fragments.installation.onboarding.screens
+
+import android.content.res.ColorStateList
+import android.os.Bundle
+import android.util.TypedValue
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import com.google.android.material.card.MaterialCardView
+import com.refayatul.fityah.databinding.FragmentCoreValuesBinding
+import com.refayatul.fityah.ui.fragments.installation.onboarding.OnboardingFragment
+import com.refayatul.fityah.ui.fragments.installation.onboarding.OnboardingViewModel
+
+class CoreValuesFragment : Fragment() {
+
+    private var _binding: FragmentCoreValuesBinding? = null
+    private val binding get() = _binding!!
+    
+    private val viewModel: OnboardingViewModel by activityViewModels()
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentCoreValuesBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.btnAction.setOnClickListener {
+            (parentFragment as? OnboardingFragment)?.goToNextPage()
+        }
+    }
+
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+}

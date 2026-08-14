@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="focus_mode">Modalità Focus</string>
+    <string name="add">Aggiungi</string>
+    <string name="save">Salva</string>
+    <string name="write_down_a_keyword">Scrivi una parola chiave</string>
+    <string name="warning_message">Messaggio di avviso</string>
+    <string name="minutes">minuti</string>
+    <string name="app_icon">app_icon</string>
+
+    <string name="admin_permission_desc">Protezione anti-disinstallazione di Fityah</string>
+    <string name="close">Chiudi</string>
+    <string name="proceed">Continua</string>
+    <string name="cancel">Annulla</string>
+    <string name="configure_warning_screen">Schermata di avviso</string>
+    <string name="proceed_in">Attendi %1$d secondi prima di premere continua</string>
+    <string name="select_all">Seleziona tutto</string>
+    <string name="clear_all">Deseleziona tutto</string>
+    <string name="focus_ready">Pronto a concentrarti?</string>
+    <string name="focus_subtitle_minimal">Seleziona la durata, poi avvia.</string>
+    <string name="focus_start">Fammi concentrare</string>
+    <string name="focus_create_group">Crea gruppo Focus</string>
+    <string name="focus_active">La modalità Focus è attiva</string>
+    <string name="focus_end_session">Termina sessione</string>
+    <string name="focus_group">Gruppo Focus</string>
+    <string name="focus_new_group">Crea nuovo gruppo</string>
+    <string name="focus_stats">Statistiche Focus</string>
+    <string name="focus_sessions_label">Sessioni</string>
+    <string name="focus_total_time_label">Tempo totale</string>
+    <string name="focus_streak_label">Serie consecutiva</string>
+    <string name="focus_avg_duration">Durata media sessione</string>
+    <string name="focus_completion_rate">Completate</string>
+    <string name="focus_top_tags">Tag principali</string>
+    <string name="quick_setup_guide">Guida rapida alla configurazione</string>
+    <string name="fityah_needs_accessibility_permissions_to_help">
+        Fityah necessita dei permessi di accessibilità per aiutarti a monitorare il tempo trascorso sullo schermo. Il processo di configurazione varia in base a come hai installato l\'app.
+    </string>
+    <string name="fdroid_installation">Installazione F-Droid</string>
+    <string name="installed_via_fdroid_appnyoure_all_set">
+        ✅ Installato tramite l\'app F-Droid?\nÈ tutto pronto! Segui semplicemente la configurazione dell\'accessibilità nel passaggio successivo.\n\n⚠️ Hai scaricato l\'app dal sito web di F-Droid?\nInstalla invece tramite l\'app F-Droid per evitare problemi di autorizzazioni.
+    </string>
+    <string name="apk_installation">Installazione APK</string>
+    <string name="if_you_installed_from_an_apk">
+        Se hai installato l\'app tramite APK, segui questi passaggi:\n\n1️⃣ Apri Impostazioni → App → Fityah\n\n2️⃣ Tocca Permessi → Accesso speciale app → Accessibilità → Abilita Fityah\n\n3️⃣ Torna alle informazioni dell\'app Fityah → Scorri verso il basso → Tocca Impostazioni limitate → Consenti\n\n💡 Consiglio: installa tramite l\'app F-Droid per una configurazione più semplice! 🚀
+    </string>
+    <string name="usage_timeline">Cronologia utilizzo</string>
+    <string name="screentime">Tempo di utilizzo</string>
+    <string name="app_opens">Aperture app</string>
+    <string name="add_to_blocked_apps">Aggiungi alle app bloccate</string>
+    <string name="label_empty_dash">-</string>
+    <string name="value_zero">0</string>
+    <string name="label_add_plus">+</string>
+    <string name="screen_time">Tempo sullo schermo</string>
+    <string name="value_zero_time">0h 0m</string>
+    <string name="sample_usage_1h">1h App</string>
+    <string name="reels_today">Reel oggi</string>
+    <string name="sample_reels_count">1.3k</string>
+    <string name="sample_percentage_increase">+100%</string>
+    <string name="blocker_tools">Confini della concentrazione</string>
+    <string name="app_blocker">App</string>
+    <string name="restrict_access_to_distracting_apps">Silenzia temporaneamente le app</string>
+    <string name="reels_blocker">Contenuti video brevi</string>
+    <string name="disable_shortform_video_feeds">
+        Nascondi i video brevi per aiutarti a mantenere la capacità di attenzione.
+    </string>
+    <string name="auto_dnd">DND automatico</string>
+    <string name="turn_on_focus_mode_between_set">
+        Attiva automaticamente la modalità Non disturbare secondo il tuo programma giornaliero.
+    </string>
+    <string name="blocked_keywords">Parole chiave e siti web</string>
+    <string name="filter_specific_words_across_apps">
+        Mantieni il tuo spazio digitale più sereno filtrando argomenti specifici.
+    </string>
+    <string name="stimulation_reducers">Promemoria consapevoli</string>
+    <string name="on_screen_reminder">Suggerimenti delicati</string>
+    <string name="put_in_messages_and_counters_floating">
+        Piccoli segnali a schermo per aiutarti a rimanere presente e concentrato.
+    </string>
+    <string name="reel_counter">Contatore video brevi</string>
+    <string name="track_the_number_of_reels_consumed">
+        Monitora e analizza il numero di contenuti brevi visualizzati
+    </string>
+    <string name="grayscale_filter">Filtro scala di grigi</string>
+    <string name="reduce_visual_stimulation">Riduci la stimolazione visiva</string>
+    <string name="fuel_the_developer">Offri un caffè allo sviluppatore ☕</string>
+    <string name="hello_this_is_nethical_the_creator">
+        Ciao, sono Nethical, il creatore di Fityah. Ho 17 anni e frequento il liceo, con una grande passione per la tecnologia e i computer. Qualche anno fa non riuscivo a trovare una soluzione gratuita per bloccare le app che soddisfacesse davvero le mie esigenze, quindi ho deciso di crearne una io stesso. Se trovi Fityah utile, considera anche una piccola donazione per supportarne lo sviluppo continuo. Grazie!
+    </string>
+    <string name="support_the_project">Supporta il progetto ↗</string>
+    <string name="join_the_focus_pack">Unisciti al Focus Pack 🐾</string>
+    <string name="dont_fix_your_screen_time_alone">
+        Non affrontare da solo il problema del tempo sullo schermo. Unisciti al nostro Discord di persone con gli stessi obiettivi, che si aiutano a vicenda e condividono strategie per migliorare la concentrazione.
+    </string>
+    <string name="join_the_discord">Unisciti a Discord</string>
+    <string name="system_diagnostics">Diagnostica di sistema</string>
+    <string name="view_and_share_application_crash_logs">
+        Visualizza e condividi i log di crash dell\'applicazione per aiutare a migliorare Fityah.
+    </string>
+    <string name="view_crash_logs">Visualizza log di crash</string>
+
+    <!-- Units -->
+    <string name="unit_minutes">Minuti</string>
+    <string name="unit_hours">Ore</string>
+    <string name="unit_days">Giorni</string>
+    <string name="group_name_required">Inserisci un nome per il gruppo</string>
+    <string name="group_limits">LIMITI</string>
+    <string name="configure_group_schedule">Ore attive</string>
+    <string name="configure_group_usage">Limite di utilizzo durante le ore attive</string>
+    <string name="configure_reel_count_limit">Configura il limite di video brevi</string>
+    <string name="schedule_section_title">ORARIO</string>
+    <string name="schedule_mode_title">Ore attive</string>
+    <string name="schedule_mode_all_day">Tutto il giorno</string>
+    <string name="schedule_mode_daily">Ogni giorno</string>
+    <string name="schedule_mode_custom">Personalizzato</string>
+    <string name="schedule_summary_all_day">Tutto il giorno, ogni giorno</string>
+    <string name="schedule_summary_daily">Ogni giorno, dalle %1$s alle %2$s</string>
+    <string name="schedule_summary_weekdays">Da lunedì a venerdì, dalle %1$s alle %2$s</string>
+    <string name="schedule_summary_custom">Orario personalizzato</string>
+    <string name="schedule_overlap_not_saved">Gli intervalli di tempo sovrapposti non sono stati salvati</string>
+    <string name="schedule_no_room_for_range">Non c’è spazio per un altro intervallo di tempo</string>
+    <string name="schedule_conflict_title">Conflitto di orario</string>
+    <string name="schedule_conflict_item">Queste app sono anche in %2$s nello stesso periodo: %1$s. Verranno applicate entrambe le regole.</string>
+    <string name="schedule_conflict_edit_apps">Modifica app</string>
+    <string name="schedule_conflict_edit_schedule">Modifica orario</string>
+    <string name="schedule_conflict_keep_both">Mantieni entrambe</string>
+    <string name="schedule_conflict_edit_group">Modifica gruppo</string>
+    <string name="schedule_conflict_cancel">Annulla</string>
+    <string name="warning_section_title">QUANDO SI ATTIVA IL BLOCCO</string>
+    <string name="select_start_time">Seleziona l’ora di inizio</string>
+    <string name="select_end_time">Seleziona l’ora di fine</string>
+    <string name="link_time_group">Limita a un gruppo orario</string>
+    <string name="no_time_group">Nessun gruppo orario (tutto il giorno)</string>
+    <string name="linked_time_group">Gruppo orario: %1$s</string>
+    <string name="linked_warning_managed">La schermata di avviso è gestita dal gruppo di utilizzo collegato</string>
+</resources>
