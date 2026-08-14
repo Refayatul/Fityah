@@ -35,10 +35,15 @@ class BlocklistManager(private val context: Context) {
         // Task 2/11: DoH/DoT IP endpoints to block at DNS level (sinkholed via VPN routes)
         val DOH_IPS = listOf(
             "8.8.8.8", "8.8.4.4",          // Google
+            "2001:4860:4860::8888", "2001:4860:4860::8844",
             "1.1.1.1", "1.0.0.1",          // Cloudflare
+            "2606:4700:4700::1111", "2606:4700:4700::1001",
             "9.9.9.9", "149.112.112.112",     // Quad9
+            "2620:fe::fe", "2620:fe::9",
             "208.67.222.222", "208.67.220.220", // OpenDNS
+            "2620:119:35::35", "2620:119:53::53",
             "94.140.14.14", "94.140.15.15",    // AdGuard
+            "2a00:5a60::ad1:0ff", "2a00:5a60::ad2:0ff",
             "76.76.2.0", "76.76.10.0",         // ControlD
             "185.228.168.9", "185.228.169.9"   // CleanBrowsing
         )

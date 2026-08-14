@@ -24,8 +24,8 @@ class DnsLockManager(private val context: Context) {
 
         CoroutineScope(Dispatchers.IO).launch {
             val targetHost = config.dnsServers.find { 
-                it.type == com.refayatul.fityah.data.models.DnsType.DOH || 
-                it.type == com.refayatul.fityah.data.models.DnsType.DOH3 
+                it.isEnabled && (it.type == com.refayatul.fityah.data.models.DnsType.DOH || 
+                it.type == com.refayatul.fityah.data.models.DnsType.DOH3)
             }?.address?.substringAfter("https://")?.substringBefore("/") ?: "dns.quad9.net"
 
             // Task 5 Fix: Validate DoT support (Port 853) before locking
@@ -47,12 +47,16 @@ class DnsLockManager(private val context: Context) {
     }
 
     private fun isDoTAvailable(hostname: String): Boolean {
-        return try {
-            java.net.Socket().use { it.connect(java.net.InetSocketAddress(hostname, 853), 3000) }
-            true
-        } catch (e: Exception) {
-            false
+        // Retry logic for DoT validation to handle transient network issues
+        for (i in 1..2) {
+            try {
+                java.net.Socket().use { it.connect(java.net.InetSocketAddress(hostname, 853), 5000) }
+                return true
+            } catch (e: Exception) {
+                if (i == 2) Log.e("DnsLock", "DoT validation failed for $hostname: ${e.message}")
+            }
         }
+        return false
     }
 
     private fun notifyFailure(hostname: String) {

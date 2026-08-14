@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.rust.android.gradle)
 }
 
 android {
@@ -15,12 +14,10 @@ android {
         consumerProguardFiles("consumer-rules.pro")
         
         ndk {
-            // Restricted to arm64-v8a for rapid testing.
             abiFilters.add("arm64-v8a")
         }
     }
 
-    // --- THE JAVA 21 FIX IS HERE ---
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
@@ -29,13 +26,12 @@ android {
     kotlinOptions {
         jvmTarget = "21"
     }
-    // -------------------------------
 
     sourceSets {
         getByName("main") {
             // Include generated UniFFI bindings
             java.srcDir("${project.buildDir}/generated/source/uniffi/main/java")
-            jniLibs.srcDirs("${project.buildDir}/rustJniLibs/android")
+            // Native libraries are in src/main/jniLibs
         }
     }
     
@@ -47,25 +43,13 @@ android {
     }
 }
 
-cargo {
-    module = "rust"
-    libname = "fityah_rust"
-    targets = listOf("arm64")
-    cargoCommand = "C:/Users/kai/.cargo/bin/cargo"
-}
-
-tasks.register<Exec>("buildRustHostLibrary") {
-    workingDir = file("rust")
-    val cargoPath = "C:/Users/kai/.cargo/bin/cargo"
-    commandLine = listOf(cargoPath, "build")
-}
-
+// Manual UniFFI Binding Generation
 tasks.register<Exec>("generateUniFFIBindings") {
-    dependsOn("buildRustHostLibrary")
     workingDir = file("rust")
     val cargoPath = "C:/Users/kai/.cargo/bin/cargo"
     val dllFile = file("rust/target/debug/fityah_rust.dll")
     
+    // Ensure the DLL exists (host build)
     commandLine = listOf(
         cargoPath, "run", "--bin", "uniffi-bindgen", "generate",
         "--library", dllFile.absolutePath,

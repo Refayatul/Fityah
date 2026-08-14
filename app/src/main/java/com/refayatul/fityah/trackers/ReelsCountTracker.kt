@@ -93,23 +93,21 @@ class ReelsCountTracker {
     }
 
     fun onEvent(event: AccessibilityEvent?, dynamicComparator: String?) {
-        if (event == null) return
-        if (!isSetup) return
+        if (!isSetup || event == null) return
         
-        val packageName = try {
-            event.packageName?.toString()
-        } catch (e: Exception) {
-            null
-        } ?: return
-
-        if (ignored.contains(packageName)) return
+        // Final Fix: Capture packageName strictly to avoid NullPointerException at line 94
+        val pkgSequence: CharSequence? = try { event.packageName } catch (e: Exception) { null }
+        if (pkgSequence == null) return
+        val pkg = pkgSequence.toString()
+        
+        if (ignored.contains(pkg)) return
 
         try {
-            val data = reelData[packageName]
-            
+            val data = reelData[pkg]
+
             if (data != null) {
                 if (dynamicComparator == null) {
-                    lastDynamicText.remove(packageName)
+                    lastDynamicText.remove(pkg)
                     hideReelCounter()
                     return
                 }
@@ -124,7 +122,7 @@ class ReelsCountTracker {
                 }
 
                 checkForReelProgression(
-                    packageName,
+                    pkg,
                     dynamicComparator,
                     data.deduplicateComparators,
                     data.initialComparator

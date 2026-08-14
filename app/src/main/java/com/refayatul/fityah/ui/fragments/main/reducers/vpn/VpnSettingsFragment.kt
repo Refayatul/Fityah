@@ -145,10 +145,13 @@ class VpnSettingsFragment : Fragment() {
 
         binding.btnTestRust.setOnClickListener {
             try {
+                System.loadLibrary("fityah_rust")
                 val msg = uniffi.fityah_rust.pingRust()
                 Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show()
             } catch (e: Exception) {
                 Toast.makeText(requireContext(), "Rust call failed: ${e.message}", Toast.LENGTH_LONG).show()
+            } catch (e: Error) {
+                Toast.makeText(requireContext(), "Rust load failed: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
     }

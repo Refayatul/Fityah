@@ -22,28 +22,29 @@ import com.refayatul.fityah.utils.BlocklistManager
 import com.refayatul.fityah.utils.DataStoreManager
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.nio.ByteBuffer
 
 class DnsVpnService : VpnService() {
-    private var vpnInterface: ParcelFileDescriptor? = null
+    private var vpnInterfaceFd: Int = -1
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private val stateLock = Mutex()
     private var vpnJob: Job? = null
     private lateinit var dataStoreManager: DataStoreManager
     
     private var vpnController: uniffi.fityah_rust.VpnController? = null
+    private var dnsProxy: UdpDnsProxy? = null
+    private var dnsHandler: DnsPacketHandler? = null
 
     private val dnsCallback = object : uniffi.fityah_rust.DnsCallback {
         override fun onDnsPacket(packet: ByteArray): ByteArray? {
             val byteBuffer = ByteBuffer.wrap(packet)
             byteBuffer.limit(packet.size)
             
-            val handler = DnsPacketHandler(
-                applicationContext, 
-                UdpDnsProxy(this@DnsVpnService), 
-                runBlocking { dataStoreManager.settings.first().vpnConfig }
-            )
+            val handler = dnsHandler ?: return null
             
             val response = runBlocking { handler.handlePacket(byteBuffer) }
             return response?.array()
@@ -133,31 +134,49 @@ class DnsVpnService : VpnService() {
     }
 
     private fun startVpn() {
-        if (vpnController != null) return
-        
         vpnJob = serviceScope.launch {
-            try {
-                val config = dataStoreManager.settings.first().vpnConfig
-                if (!config.isEnabled) {
-                    stopVpn()
-                    return@launch
+            stateLock.withLock {
+                if (vpnController != null) return@withLock
+                
+                try {
+                    // Ensure native library is loaded before any UniFFI calls
+                    try {
+                        System.loadLibrary("fityah_rust")
+                    } catch (e: UnsatisfiedLinkError) {
+                        Log.e(TAG, "Failed to load native library", e)
+                    }
+
+                    val config = dataStoreManager.settings.first().vpnConfig
+                    if (!config.isEnabled) {
+                        stopVpnInternal()
+                        return@withLock
+                    }
+
+                    // Initialize persistent proxy and handler
+                    val proxy = UdpDnsProxy(this@DnsVpnService)
+                    dnsProxy = proxy
+                    dnsHandler = DnsPacketHandler(applicationContext, proxy, config)
+                    
+                    val fd = establishVpn()
+                    if (fd == -1) return@withLock
+                    vpnInterfaceFd = fd
+                    
+                    uniffi.fityah_rust.rustInitLogger()
+                    
+                    val controller = uniffi.fityah_rust.VpnController()
+                    controller.start(fd, dnsCallback, socketProtector)
+                    vpnController = controller
+                    
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(applicationContext, "Fityah DNS Filter Active", Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "VPN Error", e)
+                    if (isActive) {
+                        delay(5000L)
+                        restartVpn()
+                    }
                 }
-                
-                establishVpn()
-                
-                val fd = vpnInterface?.fd ?: return@launch
-                uniffi.fityah_rust.rustInitLogger()
-                
-                vpnController = uniffi.fityah_rust.VpnController()
-                vpnController?.start(fd, dnsCallback, socketProtector)
-                
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(applicationContext, "Fityah DNS Filter Active", Toast.LENGTH_SHORT).show()
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "VPN Error", e)
-                if (isActive) delay(5000L)
-                restartVpn()
             }
         }
     }
@@ -168,14 +187,14 @@ class DnsVpnService : VpnService() {
 
     private fun restartVpn() {
         serviceScope.launch {
-            vpnController?.stop()
-            vpnController = null
-            vpnJob?.cancelAndJoin()
+            stateLock.withLock {
+                stopVpnInternal()
+            }
             startVpn()
         }
     }
 
-    private fun establishVpn() {
+    private fun establishVpn(): Int {
         val builder = Builder()
         val vpnConfig = runBlocking { dataStoreManager.settings.first().vpnConfig }
 
@@ -210,19 +229,35 @@ class DnsVpnService : VpnService() {
         )
         builder.setConfigureIntent(pendingIntent)
 
-        vpnInterface?.close()
-        vpnInterface = builder.establish()
+        val pfd = builder.establish()
+        // DETACH is the key to fix fdsan crash. 
+        // Java will no longer own the FD, Rust will take full responsibility.
+        return pfd?.detachFd() ?: -1
     }
 
     private fun stopVpn() {
+        serviceScope.launch {
+            stateLock.withLock {
+                stopVpnInternal()
+            }
+            stopForeground(STOP_FOREGROUND_REMOVE)
+            stopSelf()
+        }
+    }
+
+    private fun stopVpnInternal() {
         vpnController?.stop()
         vpnController = null
         vpnJob?.cancel()
         vpnJob = null
-        vpnInterface?.close()
-        vpnInterface = null
-        stopForeground(STOP_FOREGROUND_REMOVE)
-        stopSelf()
+
+        dnsProxy?.close()
+        dnsProxy = null
+        dnsHandler = null
+
+        // We don't close vpnInterfaceFd here because Rust run_vpn_loop will close it 
+        // when its File object is dropped after stop_signal is received.
+        vpnInterfaceFd = -1
     }
 
     private fun createNotificationChannel() {

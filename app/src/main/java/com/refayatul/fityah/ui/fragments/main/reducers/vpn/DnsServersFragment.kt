@@ -1,5 +1,6 @@
 package com.refayatul.fityah.ui.fragments.main.reducers.vpn
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +18,7 @@ import com.refayatul.fityah.R
 import com.refayatul.fityah.data.models.DnsServer
 import com.refayatul.fityah.data.models.DnsType
 import com.refayatul.fityah.databinding.FragmentDnsListBinding
+import com.refayatul.fityah.services.vpn.DnsVpnService
 import com.refayatul.fityah.utils.DataStoreManager
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -63,9 +65,20 @@ class DnsServersFragment : Fragment() {
                 viewLifecycleOwner.lifecycleScope.launch {
                     dataStoreManager.updateVpnConfig(config.copy(dnsServers = updatedList))
                     refreshList()
+                    // Task: Notify service to reload configuration
+                    if (config.isEnabled) {
+                        startVpnService()
+                    }
                 }
             }
         }
+    }
+
+    private fun startVpnService() {
+        val intent = Intent(requireContext(), DnsVpnService::class.java).apply {
+            action = DnsVpnService.ACTION_START
+        }
+        requireContext().startService(intent)
     }
 
     private fun showAddDialog() {
@@ -106,6 +119,9 @@ class DnsServersFragment : Fragment() {
             val newList = config.dnsServers + DnsServer(addr, type)
             dataStoreManager.updateVpnConfig(config.copy(dnsServers = newList))
             refreshList()
+            if (config.isEnabled) {
+                startVpnService()
+            }
         }
     }
 
@@ -116,7 +132,9 @@ class DnsServersFragment : Fragment() {
 
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val textAddress: TextView = view.findViewById(R.id.text_dns_address)
+            val textType: TextView = view.findViewById(R.id.text_dns_type)
             val btnRemove: View = view.findViewById(R.id.btn_remove)
+            val switchEnabled: com.google.android.material.materialswitch.MaterialSwitch = view.findViewById(R.id.switch_enabled)
 
             init {
                 btnRemove.setOnClickListener {
@@ -133,9 +151,16 @@ class DnsServersFragment : Fragment() {
                     }
                 }
                 
-                view.setOnClickListener {
-                    // Also allow clicking the whole item to remove
-                    btnRemove.performClick()
+                switchEnabled.setOnCheckedChangeListener { _, isChecked ->
+                    val pos = adapterPosition
+                    if (pos != RecyclerView.NO_POSITION) {
+                        if (list[pos].isEnabled != isChecked) {
+                            val newList = list.toMutableList().apply {
+                                this[pos] = this[pos].copy(isEnabled = isChecked)
+                            }
+                            onUpdate(newList)
+                        }
+                    }
                 }
             }
         }
@@ -148,7 +173,21 @@ class DnsServersFragment : Fragment() {
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val item = list[position]
-            holder.textAddress.text = String.format("[%s] %s", item.type.name, item.address)
+            holder.textAddress.text = item.address
+            holder.textType.text = item.type.name
+            
+            holder.switchEnabled.setOnCheckedChangeListener(null)
+            holder.switchEnabled.isChecked = item.isEnabled
+            // Re-setup listener after setting initial state
+            holder.switchEnabled.setOnCheckedChangeListener { _, isChecked ->
+                val pos = holder.adapterPosition
+                if (pos != RecyclerView.NO_POSITION) {
+                    val newList = list.toMutableList().apply {
+                        this[pos] = this[pos].copy(isEnabled = isChecked)
+                    }
+                    onUpdate(newList)
+                }
+            }
         }
 
         override fun getItemCount() = list.size

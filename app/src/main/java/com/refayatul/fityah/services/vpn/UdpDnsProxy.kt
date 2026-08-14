@@ -20,35 +20,46 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class UdpDnsProxy(private val service: DnsVpnService) {
-    private val udpSocket = DatagramSocket().apply {
-        service.protectSocket(this)
-        soTimeout = 3000
-    }
+    private var udpSocket: DatagramSocket? = null
     
     private val cronetEngine: CronetEngine by lazy {
         CronetEngine.Builder(service)
             .enableQuic(true)
             .enableHttp2(true)
             .enableBrotli(true)
-            // Privacy Hardening: Disable metrics and cache to avoid tracking
             .enableHttpCache(CronetEngine.Builder.HTTP_CACHE_DISABLED, 0)
             .build()
     }
     
-    private val cronetExecutor: Executor = Executors.newSingleThreadExecutor()
+    private val cronetExecutor: Executor = Executors.newFixedThreadPool(4)
+
+    private fun getSocket(): DatagramSocket {
+        val s = udpSocket
+        if (s != null && !s.isClosed) return s
+        
+        val newSocket = DatagramSocket().apply {
+            service.protect(this) // Use VpnService.protect()
+            soTimeout = 5000
+        }
+        udpSocket = newSocket
+        return newSocket
+    }
 
     suspend fun resolve(query: ByteArray, servers: List<DnsServer>): ByteArray? = withContext(Dispatchers.IO) {
-        // 1. Check local cache first
+        // ... (rest of resolve logic stays same, just uses getSocket())
+        val socket = getSocket()
+        
+        // 1. Check local cache
         DnsCache.get(query)?.let { return@withContext it }
 
-        // 2. Try each server in order (failover)
+        // 2. Try each server in order
         for (server in servers) {
             if (!server.isEnabled) continue
             
             val result = try {
                 when (server.type) {
                     DnsType.DOH, DnsType.DOH3 -> resolveSecure(query, server.address)
-                    DnsType.PLAIN -> resolvePlain(query, server.address)
+                    DnsType.PLAIN -> resolvePlain(query, server.address, socket)
                 }
             } catch (e: Exception) {
                 null
@@ -62,20 +73,29 @@ class UdpDnsProxy(private val service: DnsVpnService) {
         null
     }
 
-    private fun resolvePlain(query: ByteArray, upstream: String): ByteArray? {
+    private fun resolvePlain(query: ByteArray, upstream: String, socket: DatagramSocket): ByteArray? {
         return try {
             val address = InetAddress.getByName(upstream)
             val packet = DatagramPacket(query, query.size, address, 53)
-            udpSocket.send(packet)
+            socket.send(packet)
 
-            val buffer = ByteArray(1024)
+            val buffer = ByteArray(2048)
             val responsePacket = DatagramPacket(buffer, buffer.size)
-            udpSocket.receive(responsePacket)
+            socket.receive(responsePacket)
             
             responsePacket.data.copyOfRange(0, responsePacket.length)
         } catch (e: Exception) {
             null
         }
+    }
+
+    fun close() {
+        try {
+            udpSocket?.close()
+            udpSocket = null
+            // CronetEngine doesn't have a simple close, but dropping the reference is usually enough
+            // unless we want to call shutdown() which might affect other parts of the app.
+        } catch (e: Exception) {}
     }
 
     private suspend fun resolveSecure(query: ByteArray, url: String): ByteArray? = suspendCoroutine { continuation ->
