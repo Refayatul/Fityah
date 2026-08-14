@@ -157,6 +157,11 @@ class ReducersFragment : Fragment() {
         val advancedHeader = view.findViewById<View>(R.id.advanced_header)
         val advancedContent = view.findViewById<View>(R.id.advanced_content)
         val advancedArrow = view.findViewById<ImageView>(R.id.advanced_arrow)
+
+        // Auto-expand advanced options
+        advancedContent.isVisible = true
+        advancedArrow.rotation = 90f
+
         advancedHeader.setOnClickListener {
             val isVisible = advancedContent.isVisible
             TransitionManager.beginDelayedTransition(view.findViewById(R.id.reducers_root), AutoTransition())

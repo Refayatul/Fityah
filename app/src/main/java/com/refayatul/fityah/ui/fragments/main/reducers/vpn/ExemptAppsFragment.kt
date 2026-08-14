@@ -97,7 +97,6 @@ class ExemptAppsFragment : Fragment() {
 
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val text: TextView = view.findViewById(android.R.id.text1)
-            val icon: ImageView = view.findViewById(android.R.id.icon) // simple_list_item_1 doesn't have icon, but some others do
             
             init {
                 view.setOnClickListener {

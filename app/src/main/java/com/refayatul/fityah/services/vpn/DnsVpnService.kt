@@ -26,6 +26,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.net.InetAddress
 import java.nio.ByteBuffer
 
 class DnsVpnService : VpnService() {
@@ -247,35 +248,33 @@ class DnsVpnService : VpnService() {
         val exempt = vpnConfig.exemptPackages.toMutableSet()
         exempt.add(packageName)
 
-        // DNS Intercept Alias Model:
-        // 1. Give the phone an IP (10.1.10.2)
-        // 2. Set the DNS server to a fake local IP (10.1.10.1)
-        // 3. ONLY route that fake IP to the VPN.
-        // This ensures NO browsing traffic (TCP) ever enters the VPN core.
+        // 1. Discovery Phase: Find all system DNS servers to intercept them
+        val systemDnsServers = mutableListOf<InetAddress>()
+        try {
+            val cm = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+            val lp = cm.getLinkProperties(cm.activeNetwork)
+            lp?.dnsServers?.let { systemDnsServers.addAll(it) }
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to discover system DNS", e)
+        }
+
+        // 2. IPv4 Intercept Alias
         builder.addAddress("10.1.10.2", 32)
         builder.addDnsServer("10.1.10.1")
         builder.addRoute("10.1.10.1", 32)
 
-        // Prevent DNS Leaks via IPv6
+        // 3. IPv6 Intercept Alias
         try {
             builder.addAddress("fd00:fityah::2", 128)
             builder.addDnsServer("fd00:fityah::1")
             builder.addRoute("fd00:fityah::1", 128)
-        } catch (e: Exception) {
-            Log.w(TAG, "IPv6 not supported on this device/network", e)
-        }
+        } catch (e: Exception) {}
 
-        // Aggressively intercept common public DNS to prevent bypass
-        for (ip in BlocklistManager.DOH_IPS) {
-            try {
-                if (ip.contains(":")) {
-                    builder.addRoute(ip, 128)
-                } else {
-                    builder.addRoute(ip, 32)
-                }
-            } catch (e: Exception) {}
-        }
-        
+        // 4. Selective Interception: ONLY route the alias IPs
+        // Do NOT route public IPs like 8.8.8.8 here, as it causes circular loops and lag
+        // if the app itself tries to use them for bootstrapping.
+        // The system DNS will naturally point to 10.1.10.1 because of builder.addDnsServer().
+
         for (pkg in exempt) {
             try {
                 builder.addDisallowedApplication(pkg)

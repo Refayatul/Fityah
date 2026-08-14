@@ -1,10 +1,10 @@
 use std::sync::Arc;
 use tokio::sync::Mutex;
-use log::{info, error, debug};
+use log::{info, error};
 use std::io::{Read, Write};
 
 #[cfg(unix)]
-use std::os::unix::io::{FromRawFd};
+use std::os::unix::io::{FromRawFd, AsRawFd, OwnedFd};
 
 uniffi::setup_scaffolding!();
 
@@ -12,7 +12,7 @@ uniffi::setup_scaffolding!();
 pub fn rust_init_logger() {
     android_logger::init_once(
         android_logger::Config::default()
-            .with_max_level(log::LevelFilter::Debug)
+            .with_max_level(log::LevelFilter::Info) // Reduced log level
             .with_tag("FityahRust"),
     );
 }
@@ -47,7 +47,7 @@ impl VpnController {
     }
 
     pub fn start(&self, fd: i32, callback: Box<dyn DnsCallback>, _protector: Box<dyn SocketProtector>) {
-        info!("Starting Fityah VPN Core v5 (DNS Intercept Mode) with fd: {}", fd);
+        info!("Starting Fityah VPN Core v6 (Async DNS Bridge) with fd: {}", fd);
         let stop_signal = self.stop_signal.clone();
 
         #[cfg(unix)]
@@ -81,52 +81,61 @@ async fn run_dns_bridge_loop(
     callback: Box<dyn DnsCallback>,
     stop_signal: Arc<Mutex<bool>>
 ) -> anyhow::Result<()> {
-    // Android 15 compatibility: Duplicate the FD so we own it independently of ParcelFileDescriptor
+    use tokio::io::unix::AsyncFd;
+    use tokio::io::Interest;
+
+    // Android 15 compatibility: Duplicate the FD
     let duped_fd = unsafe { libc::dup(fd) };
     if duped_fd < 0 {
         return Err(anyhow::anyhow!("Failed to duplicate TUN fd"));
     }
 
-    // Set to non-blocking for use with std::fs::File (which we'll use in a simple way)
+    // Set to non-blocking for use with AsyncFd
     unsafe {
         let flags = libc::fcntl(duped_fd, libc::F_GETFL);
         libc::fcntl(duped_fd, libc::F_SETFL, flags | libc::O_NONBLOCK);
     }
 
-    let mut tun_file = unsafe { std::fs::File::from_raw_fd(duped_fd) };
-    let mut buf = [0u8; 4096];
+    let owned_fd = unsafe { OwnedFd::from_raw_fd(duped_fd) };
+    let async_fd = AsyncFd::with_interest(owned_fd, Interest::READABLE)?;
 
-    info!("VPN Core Bridge active: Intercepting DNS at 10.1.10.1");
+    let mut buf = [0u8; 4096];
+    info!("VPN Core Bridge active: Intercepting DNS (Async Mode)");
 
     loop {
         if *stop_signal.lock().await { break; }
 
-        match tun_file.read(&mut buf) {
-            Ok(n) if n > 0 => {
-                let packet_data = buf[..n].to_vec();
-                debug!("Received packet, size: {}", n);
+        let mut guard = async_fd.readable().await?;
 
-                // Offload resolution to Kotlin
-                // Note: Kotlin builds the full IP response packet
-                if let Some(response_packet) = callback.on_dns_packet(packet_data) {
-                    if !response_packet.is_empty() {
-                        debug!("Sending response back to TUN, size: {}", response_packet.len());
-                        let _ = tun_file.write_all(&response_packet);
+        // Read raw data from the underlying FD
+        let raw_fd = async_fd.as_raw_fd();
+        let n = unsafe {
+            libc::read(raw_fd, buf.as_mut_ptr() as *mut libc::c_void, buf.len())
+        };
+
+        if n > 0 {
+            let packet_data = buf[..n as usize].to_vec();
+            if let Some(response_packet) = callback.on_dns_packet(packet_data) {
+                if !response_packet.is_empty() {
+                    // Write back to the TUN
+                    unsafe {
+                        libc::write(raw_fd, response_packet.as_ptr() as *const libc::c_void, response_packet.len());
                     }
                 }
             }
-            Err(ref e) if e.kind() == std::io::ErrorKind::WouldBlock => {
-                tokio::task::yield_now().await;
-                continue;
-            }
-            Ok(_) => {} // Empty read
-            Err(e) => {
-                error!("TUN read error: {:?}", e);
+        } else if n < 0 {
+            let err = std::io::Error::last_os_error();
+            if err.kind() == std::io::ErrorKind::WouldBlock {
+                guard.clear_ready();
+            } else {
+                error!("TUN read error: {:?}", err);
                 break;
             }
+        } else {
+            // EOF
+            break;
         }
     }
 
-    unsafe { libc::close(duped_fd); }
     Ok(())
 }

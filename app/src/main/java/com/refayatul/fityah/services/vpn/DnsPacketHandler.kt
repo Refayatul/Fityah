@@ -1,7 +1,6 @@
 package com.refayatul.fityah.services.vpn
 
 import android.content.Context
-import android.util.Log
 import com.refayatul.fityah.data.models.VpnConfig
 import com.refayatul.fityah.utils.BlocklistManager
 import kotlinx.coroutines.Dispatchers
@@ -35,11 +34,6 @@ class DnsPacketHandler(private val context: Context, private val proxy: UdpDnsPr
         val dstIp = String.format(Locale.US, "%d.%d.%d.%d", 
             buffer[16].toInt() and 0xFF, buffer[17].toInt() and 0xFF, 
             buffer[18].toInt() and 0xFF, buffer[19].toInt() and 0xFF)
-        val srcIp = String.format(Locale.US, "%d.%d.%d.%d",
-            buffer[12].toInt() and 0xFF, buffer[13].toInt() and 0xFF,
-            buffer[14].toInt() and 0xFF, buffer[15].toInt() and 0xFF)
-
-        Log.v("DnsPacketHandler", "Inbound IPv4: $srcIp -> $dstIp (proto: $protocol)")
 
         if (protocol == 17) { // UDP
             val udpHeaderStart = ipHeaderLength
@@ -49,9 +43,6 @@ class DnsPacketHandler(private val context: Context, private val proxy: UdpDnsPr
                 val dnsDataStart = udpHeaderStart + 8
                 val dnsDataLength = limit - dnsDataStart
                 val domain = parseDnsQuery(buffer, dnsDataStart, dnsDataLength) ?: return null
-                
-                // Task: Detailed logging for debugging
-                Log.d("DnsVpn", "Processing UDP DNS query for: $domain to $dstIp")
                 
                 return processDomain(domain, buffer, limit, ipHeaderLength, udpHeaderStart, 4)
             }
@@ -66,7 +57,6 @@ class DnsPacketHandler(private val context: Context, private val proxy: UdpDnsPr
             
             // Task 2: Block DoH (443) and DoT (853) to known resolver IPs
             if ((dstPort == 443 || dstPort == 853) && BlocklistManager.DOH_IPS.contains(dstIp)) {
-                Log.d("DnsVpn", "Blocking secure DNS bypass attempt to $dstIp:$dstPort")
                 return null 
             }
         }
@@ -93,17 +83,14 @@ class DnsPacketHandler(private val context: Context, private val proxy: UdpDnsPr
     }
 
     private suspend fun processDomain(domain: String, buffer: ByteArray, limit: Int, ipLen: Int, udpStart: Int, version: Int): ByteBuffer? {
-        Log.i("DnsPacketHandler", "Filtering domain: $domain (v$version)")
         if (version == 4 && config.forcedSafeSearch) {
             val safeIp = getSafeSearchIp(domain)
             if (safeIp != null) {
-                Log.d("DnsVpn", "SafeSearch redirect: $domain -> $safeIp")
                 return createDnsAResponse(buffer, limit, ipLen, udpStart, safeIp)
             }
         }
 
         if (config.useLocalBlocklist && blocklistManager.isDomainBlocked(domain)) {
-            Log.d("DnsVpn", "Blocking: $domain")
             return createNxDomainResponse(buffer, limit, ipLen, udpStart, version)
         }
         
@@ -111,15 +98,12 @@ class DnsPacketHandler(private val context: Context, private val proxy: UdpDnsPr
         val query = buffer.copyOfRange(dnsDataStart, limit)
         
         // Final Fix: Resolve via proxy with logging
-        Log.d("DnsVpn", "Resolving $domain via proxy...")
         val dnsResponse = proxy.resolve(query, config.dnsServers)
         
         if (dnsResponse == null) {
-            Log.w("DnsVpn", "Proxy failed to resolve $domain")
             return null
         }
         
-        Log.d("DnsVpn", "Successfully resolved $domain")
         return createResponsePacket(buffer, ipLen, udpStart, dnsResponse, version)
     }
 

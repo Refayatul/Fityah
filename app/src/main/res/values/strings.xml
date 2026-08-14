@@ -72,8 +72,8 @@
     <string name="track_the_number_of_reels_consumed">Track and analyze the number of short-form content consumed</string>
     <string name="grayscale_filter">Grayscale Filter</string>
     <string name="reduce_visual_stimulation">Reduce visual stimulation</string>
-    <string name="fuel_the_developer">About the Developer ☕</string>
-    <string name="hello_this_is_nethical_the_creator">Hey, I\'m Nethical, the person behind Fityah. I\'m 18, fresh out of high school, and a little obsessed with tech, art, and building cool things from scratch. A while back I went looking for a free app blocker that actually did what I wanted. Nothing came close, so I built my own. Fityah is that app, and I\'ve been pouring into it almost every day for over two years now. So happy you\'re here. I hope it helps you take your time back.</string>
+    <string name="fuel_the_developer">About Fityah</string>
+    <string name="hello_this_is_nethical_the_creator">Fityah is a privacy-first app blocker built to help you take your time back. It\'s been in development for over two years, focusing on providing a powerful yet free tool for everyone. So happy you\'re here.</string>
     <string name="support_the_project">Support the Project ↗</string>
     <string name="join_the_focus_pack">Join the Focus Pack</string>
     <string name="dont_fix_your_screen_time_alone">Don\'t fix your screen time alone. Join our Discord of like-minded people holding each other accountable and sharing focus strategies to improve themselves.</string>
@@ -86,7 +86,7 @@
     <string name="fityah_also_on">Fityah Also On</string>
     <string name="label_browser_extension">Browser Extension</string>
     <string name="fityah_extension_repo">fityah-extension</string>
-    <string name="about_the_developer">About the Developer</string>
+    <string name="about_the_developer">About Fityah</string>
     <string name="view_on_github">View on GitHub ↗</string>
     <string name="donate_title">Donate</string>
     <string name="donate_pitch">I\'ve put 1500+ hours into Fityah, building it alongside school, exams and study, to save millions of minutes worldwide. Donate to help me keep it free and growing for everyone.</string>
