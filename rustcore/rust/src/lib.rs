@@ -1,10 +1,10 @@
 use std::sync::Arc;
 use tokio::sync::Mutex;
-use log::{info, error};
+use log::{info, error, debug};
 use std::io::{Read, Write};
 
 #[cfg(unix)]
-use std::os::unix::io::{FromRawFd, AsRawFd};
+use std::os::unix::io::{FromRawFd};
 
 uniffi::setup_scaffolding!();
 
@@ -104,11 +104,13 @@ async fn run_dns_bridge_loop(
         match tun_file.read(&mut buf) {
             Ok(n) if n > 0 => {
                 let packet_data = buf[..n].to_vec();
+                debug!("Received packet, size: {}", n);
 
                 // Offload resolution to Kotlin
                 // Note: Kotlin builds the full IP response packet
                 if let Some(response_packet) = callback.on_dns_packet(packet_data) {
                     if !response_packet.is_empty() {
+                        debug!("Sending response back to TUN, size: {}", response_packet.len());
                         let _ = tun_file.write_all(&response_packet);
                     }
                 }

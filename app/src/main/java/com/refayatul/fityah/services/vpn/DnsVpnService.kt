@@ -255,6 +255,26 @@ class DnsVpnService : VpnService() {
         builder.addAddress("10.1.10.2", 32)
         builder.addDnsServer("10.1.10.1")
         builder.addRoute("10.1.10.1", 32)
+
+        // Prevent DNS Leaks via IPv6
+        try {
+            builder.addAddress("fd00:fityah::2", 128)
+            builder.addDnsServer("fd00:fityah::1")
+            builder.addRoute("fd00:fityah::1", 128)
+        } catch (e: Exception) {
+            Log.w(TAG, "IPv6 not supported on this device/network", e)
+        }
+
+        // Aggressively intercept common public DNS to prevent bypass
+        for (ip in BlocklistManager.DOH_IPS) {
+            try {
+                if (ip.contains(":")) {
+                    builder.addRoute(ip, 128)
+                } else {
+                    builder.addRoute(ip, 32)
+                }
+            } catch (e: Exception) {}
+        }
         
         for (pkg in exempt) {
             try {
@@ -268,6 +288,7 @@ class DnsVpnService : VpnService() {
         builder.setSession("Fityah DNS Filter")
         builder.setBlocking(true)
         builder.allowFamily(android.system.OsConstants.AF_INET)
+        builder.allowFamily(android.system.OsConstants.AF_INET6)
         builder.allowBypass()
         
         val pendingIntent = PendingIntent.getActivity(

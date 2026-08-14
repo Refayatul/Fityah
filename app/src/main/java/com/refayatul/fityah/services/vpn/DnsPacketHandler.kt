@@ -35,6 +35,11 @@ class DnsPacketHandler(private val context: Context, private val proxy: UdpDnsPr
         val dstIp = String.format(Locale.US, "%d.%d.%d.%d", 
             buffer[16].toInt() and 0xFF, buffer[17].toInt() and 0xFF, 
             buffer[18].toInt() and 0xFF, buffer[19].toInt() and 0xFF)
+        val srcIp = String.format(Locale.US, "%d.%d.%d.%d",
+            buffer[12].toInt() and 0xFF, buffer[13].toInt() and 0xFF,
+            buffer[14].toInt() and 0xFF, buffer[15].toInt() and 0xFF)
+
+        Log.v("DnsPacketHandler", "Inbound IPv4: $srcIp -> $dstIp (proto: $protocol)")
 
         if (protocol == 17) { // UDP
             val udpHeaderStart = ipHeaderLength
@@ -88,6 +93,7 @@ class DnsPacketHandler(private val context: Context, private val proxy: UdpDnsPr
     }
 
     private suspend fun processDomain(domain: String, buffer: ByteArray, limit: Int, ipLen: Int, udpStart: Int, version: Int): ByteBuffer? {
+        Log.i("DnsPacketHandler", "Filtering domain: $domain (v$version)")
         if (version == 4 && config.forcedSafeSearch) {
             val safeIp = getSafeSearchIp(domain)
             if (safeIp != null) {
