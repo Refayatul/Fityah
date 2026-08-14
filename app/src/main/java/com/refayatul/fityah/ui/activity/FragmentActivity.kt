@@ -32,6 +32,8 @@ import com.refayatul.fityah.ui.fragments.main.reducers.vpn.BlocklistSourcesFragm
 import com.refayatul.fityah.ui.fragments.main.reducers.vpn.DnsServersFragment
 import com.refayatul.fityah.ui.fragments.main.reducers.vpn.ExemptAppsFragment
 import com.refayatul.fityah.ui.fragments.main.reducers.vpn.DnsLogsFragment
+import com.refayatul.fityah.ui.fragments.main.reducers.vpn.VpnAppsFragment
+import com.refayatul.fityah.ui.fragments.main.reducers.vpn.VpnAppDetailFragment
 import com.refayatul.fityah.ui.fragments.main.reducers.advanced.TrustedContactFragment
 import androidx.core.view.isVisible
 import android.animation.ValueAnimator
@@ -122,6 +124,8 @@ class FragmentActivity : AppCompatActivity() {
             DnsServersFragment.FRAGMENT_ID,
             ExemptAppsFragment.FRAGMENT_ID,
             DnsLogsFragment.FRAGMENT_ID,
+            VpnAppsFragment.FRAGMENT_ID,
+            VpnAppDetailFragment.FRAGMENT_ID,
             TrustedContactFragment.FRAGMENT_ID,
             CreateKeywordGroupFragment.FRAGMENT_ID -> {
                 // Hide bottom nav for these standalone fragments
@@ -154,6 +158,8 @@ class FragmentActivity : AppCompatActivity() {
                     DnsServersFragment.FRAGMENT_ID -> DnsServersFragment()
                     ExemptAppsFragment.FRAGMENT_ID -> ExemptAppsFragment()
                     DnsLogsFragment.FRAGMENT_ID -> DnsLogsFragment()
+                    VpnAppsFragment.FRAGMENT_ID -> VpnAppsFragment()
+                    VpnAppDetailFragment.FRAGMENT_ID -> VpnAppDetailFragment()
                     TrustedContactFragment.FRAGMENT_ID -> TrustedContactFragment()
                     else -> AccessibilityGuide()
                 }

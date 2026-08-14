@@ -93,6 +93,7 @@ class DnsPacketHandler(private val context: Context, private val proxy: UdpDnsPr
         Log.d("DnsPacketHandler", "Processing domain: $domain from $srcIp:$srcPort")
         // App Attribution Logic
         var attributedAppName = "System / Unknown"
+        var attributedPackageName: String? = null
         try {
             val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as? android.net.ConnectivityManager
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q && cm != null) {
@@ -102,7 +103,8 @@ class DnsPacketHandler(private val context: Context, private val proxy: UdpDnsPr
                 if (uid != android.os.Process.INVALID_UID) {
                     val packageManager = context.packageManager
                     val packages = packageManager.getPackagesForUid(uid)
-                    attributedAppName = packages?.firstOrNull()?.let { pkg ->
+                    attributedPackageName = packages?.firstOrNull()
+                    attributedAppName = attributedPackageName?.let { pkg ->
                         try { packageManager.getApplicationLabel(packageManager.getApplicationInfo(pkg, 0)).toString() } catch (e: Exception) { pkg }
                     } ?: "System / Unknown"
                 }
@@ -120,14 +122,14 @@ class DnsPacketHandler(private val context: Context, private val proxy: UdpDnsPr
             val safeIp = getSafeSearchIp(domain)
             if (safeIp != null) {
                 Log.d("DnsPacketHandler", "Logging SafeSearch: $domain")
-                dnsDao.insertLog(DnsRequestLogEntity(domain = domain, appName = attributedAppName, isBlocked = false, trackerName = trackerName))
+                dnsDao.insertLog(DnsRequestLogEntity(domain = domain, appName = attributedAppName, packageName = attributedPackageName, isBlocked = false, trackerName = trackerName))
                 return createDnsAResponse(buffer, limit, ipLen, udpStart, safeIp)
             }
         }
 
         if (config.useLocalBlocklist && blocklistManager.isDomainBlocked(domain)) {
             Log.d("DnsPacketHandler", "Logging Blocked: $domain")
-            dnsDao.insertLog(DnsRequestLogEntity(domain = domain, appName = attributedAppName, isBlocked = true, trackerName = trackerName))
+            dnsDao.insertLog(DnsRequestLogEntity(domain = domain, appName = attributedAppName, packageName = attributedPackageName, isBlocked = true, trackerName = trackerName))
             return createNxDomainResponse(buffer, limit, ipLen, udpStart, version)
         }
         
@@ -142,7 +144,7 @@ class DnsPacketHandler(private val context: Context, private val proxy: UdpDnsPr
         }
         
         Log.d("DnsPacketHandler", "Logging Allowed: $domain")
-        dnsDao.insertLog(DnsRequestLogEntity(domain = domain, appName = attributedAppName, isBlocked = false, trackerName = trackerName))
+        dnsDao.insertLog(DnsRequestLogEntity(domain = domain, appName = attributedAppName, packageName = attributedPackageName, isBlocked = false, trackerName = trackerName))
         return createResponsePacket(buffer, ipLen, udpStart, dnsResponse, version)
     }
 

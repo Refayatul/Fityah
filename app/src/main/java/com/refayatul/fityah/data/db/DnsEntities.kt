@@ -29,6 +29,7 @@ data class DnsRequestLogEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val domain: String,
     val appName: String,
+    val packageName: String? = null,
     val timestamp: Long = System.currentTimeMillis(),
     val isBlocked: Boolean,
     val trackerName: String? = null

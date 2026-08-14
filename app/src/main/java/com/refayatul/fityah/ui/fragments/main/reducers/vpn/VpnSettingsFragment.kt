@@ -162,6 +162,13 @@ class VpnSettingsFragment : Fragment() {
             startActivity(intent)
         }
 
+        binding.cardVpnApps.setOnClickListener {
+            val intent = Intent(requireContext(), FragmentActivity::class.java).apply {
+                putExtra("fragment", VpnAppsFragment.FRAGMENT_ID)
+            }
+            startActivity(intent)
+        }
+
         binding.cardDnsLogs.setOnClickListener {
             val intent = Intent(requireContext(), FragmentActivity::class.java).apply {
                 putExtra("fragment", DnsLogsFragment.FRAGMENT_ID)

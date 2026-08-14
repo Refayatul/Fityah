@@ -52,4 +52,27 @@ interface DnsDao {
 
     @Query("DELETE FROM dns_request_logs WHERE timestamp < :threshold")
     suspend fun cleanupLogs(threshold: Long)
+
+    @Query("""
+        SELECT packageName, appName, 
+        COUNT(*) as totalRequests, 
+        SUM(CASE WHEN isBlocked = 1 THEN 1 ELSE 0 END) as blockedRequests,
+        SUM(CASE WHEN trackerName IS NOT NULL THEN 1 ELSE 0 END) as trackerRequests
+        FROM dns_request_logs 
+        WHERE packageName IS NOT NULL
+        GROUP BY packageName 
+        ORDER BY totalRequests DESC
+    """)
+    suspend fun getAppStats(): List<VpnAppStats>
+
+    @Query("SELECT * FROM dns_request_logs WHERE packageName = :pkg ORDER BY timestamp DESC LIMIT 200")
+    suspend fun getLogsForApp(pkg: String): List<DnsRequestLogEntity>
 }
+
+data class VpnAppStats(
+    val packageName: String,
+    val appName: String,
+    val totalRequests: Int,
+    val blockedRequests: Int,
+    val trackerRequests: Int
+)
