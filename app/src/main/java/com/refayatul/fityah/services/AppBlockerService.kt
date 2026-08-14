@@ -116,6 +116,7 @@ class AppBlockerService : BaseBlockingService() {
         super.onCreate()
         crashLogger = CrashLogger(this)
         try {
+            // Task: Store listener to prevent leak
             rikka.shizuku.ShizukuProvider.requestBinderForNonProviderProcess(this)
         } catch (e: Exception) {
             Log.e("Shizuku", "Failed to bind Shizuku in non-provider process", e)
