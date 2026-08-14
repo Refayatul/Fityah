@@ -247,11 +247,14 @@ class DnsVpnService : VpnService() {
         val exempt = vpnConfig.exemptPackages.toMutableSet()
         exempt.add(packageName)
 
-        // Using 10.1.10.x to avoid common home network conflicts
-        builder.addAddress("10.1.10.2", 24)
-        builder.addRoute("0.0.0.0", 0)
-
-        builder.addDnsServer("192.0.2.1")
+        // DNS Intercept Alias Model:
+        // 1. Give the phone an IP (10.1.10.2)
+        // 2. Set the DNS server to a fake local IP (10.1.10.1)
+        // 3. ONLY route that fake IP to the VPN.
+        // This ensures NO browsing traffic (TCP) ever enters the VPN core.
+        builder.addAddress("10.1.10.2", 32)
+        builder.addDnsServer("10.1.10.1")
+        builder.addRoute("10.1.10.1", 32)
         
         for (pkg in exempt) {
             try {
