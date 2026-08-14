@@ -44,6 +44,10 @@ class DnsPacketHandler(private val context: Context, private val proxy: UdpDnsPr
                 val dnsDataStart = udpHeaderStart + 8
                 val dnsDataLength = limit - dnsDataStart
                 val domain = parseDnsQuery(buffer, dnsDataStart, dnsDataLength) ?: return null
+                
+                // Task: Detailed logging for debugging
+                Log.d("DnsVpn", "Processing UDP DNS query for: $domain to $dstIp")
+                
                 return processDomain(domain, buffer, limit, ipHeaderLength, udpHeaderStart, 4)
             }
             
@@ -84,12 +88,10 @@ class DnsPacketHandler(private val context: Context, private val proxy: UdpDnsPr
     }
 
     private suspend fun processDomain(domain: String, buffer: ByteArray, limit: Int, ipLen: Int, udpStart: Int, version: Int): ByteBuffer? {
-        // Task 2 Fix: Block known DoH/DoT IPs on standard ports
-        // This is handled in handleIpv4/handleIpv6 by checking destination port and IP.
-        
         if (version == 4 && config.forcedSafeSearch) {
             val safeIp = getSafeSearchIp(domain)
             if (safeIp != null) {
+                Log.d("DnsVpn", "SafeSearch redirect: $domain -> $safeIp")
                 return createDnsAResponse(buffer, limit, ipLen, udpStart, safeIp)
             }
         }
@@ -101,8 +103,17 @@ class DnsPacketHandler(private val context: Context, private val proxy: UdpDnsPr
         
         val dnsDataStart = udpStart + 8
         val query = buffer.copyOfRange(dnsDataStart, limit)
-        val dnsResponse = proxy.resolve(query, config.dnsServers) ?: return null
         
+        // Final Fix: Resolve via proxy with logging
+        Log.d("DnsVpn", "Resolving $domain via proxy...")
+        val dnsResponse = proxy.resolve(query, config.dnsServers)
+        
+        if (dnsResponse == null) {
+            Log.w("DnsVpn", "Proxy failed to resolve $domain")
+            return null
+        }
+        
+        Log.d("DnsVpn", "Successfully resolved $domain")
         return createResponsePacket(buffer, ipLen, udpStart, dnsResponse, version)
     }
 

@@ -1,6 +1,6 @@
 use std::sync::Arc;
 use tokio::sync::Mutex;
-use log::{info, error, debug, warn};
+use log::{info, error, debug};
 use std::io::{Read, Write};
 use std::collections::HashMap;
 use std::net::{SocketAddr, IpAddr};
@@ -83,6 +83,8 @@ impl VpnController {
 struct TunDevice {
     file: std::fs::File,
     rx_queue: Vec<Vec<u8>>,
+    // Mapping to restore original source IPs in responses (Reverse NAT)
+    reverse_nat: Arc<std::sync::Mutex<HashMap<u16, SocketAddr>>>,
 }
 
 #[cfg(unix)]
@@ -95,11 +97,11 @@ impl smoltcp::phy::Device for TunDevice {
             return None;
         }
         let buffer = self.rx_queue.remove(0);
-        Some((RxToken { buffer }, TxToken { file: &mut self.file }))
+        Some((RxToken { buffer }, TxToken { file: &mut self.file, reverse_nat: self.reverse_nat.clone() }))
     }
 
     fn transmit(&mut self, _timestamp: smoltcp::time::Instant) -> Option<Self::TxToken<'_>> {
-        Some(TxToken { file: &mut self.file })
+        Some(TxToken { file: &mut self.file, reverse_nat: self.reverse_nat.clone() })
     }
 
     fn capabilities(&self) -> smoltcp::phy::DeviceCapabilities {
@@ -117,12 +119,114 @@ impl smoltcp::phy::RxToken for RxToken {
     fn consume<R, F>(mut self, f: F) -> R where F: FnOnce(&mut [u8]) -> R { f(&mut self.buffer) }
 }
 #[cfg(unix)]
-struct TxToken<'a> { file: &'a mut std::fs::File }
+struct TxToken<'a> {
+    file: &'a mut std::fs::File,
+    reverse_nat: Arc<std::sync::Mutex<HashMap<u16, SocketAddr>>>,
+}
 #[cfg(unix)]
 impl<'a> smoltcp::phy::TxToken for TxToken<'a> {
     fn consume<R, F>(self, len: usize, f: F) -> R where F: FnOnce(&mut [u8]) -> R {
         let mut buffer = vec![0u8; len];
         let result = f(&mut buffer);
+
+        // --- Reverse NAT: Restore Source IP so Android OS recognizes the response ---
+        use smoltcp::wire::{Ipv4Packet, Ipv6Packet, TcpPacket, UdpPacket, IpProtocol};
+
+        let mut rewritten = false;
+        let version = buffer[0] >> 4;
+
+        if version == 4 {
+            let mut dst_port = 0;
+            let mut src_port = 0;
+
+            if let Ok(ip_pkt) = Ipv4Packet::new_checked(&buffer) {
+                if ip_pkt.dst_addr() == smoltcp::wire::Ipv4Address::new(10, 1, 10, 2) {
+                    dst_port = match ip_pkt.next_header() {
+                        IpProtocol::Tcp => TcpPacket::new_checked(ip_pkt.payload()).map(|p| p.dst_port()).unwrap_or(0),
+                        IpProtocol::Udp => UdpPacket::new_checked(ip_pkt.payload()).map(|p| p.dst_port()).unwrap_or(0),
+                        _ => 0,
+                    };
+                    src_port = match ip_pkt.next_header() {
+                        IpProtocol::Tcp => TcpPacket::new_checked(ip_pkt.payload()).map(|p| p.src_port()).unwrap_or(0),
+                        IpProtocol::Udp => UdpPacket::new_checked(ip_pkt.payload()).map(|p| p.src_port()).unwrap_or(0),
+                        _ => 0,
+                    };
+                }
+            }
+
+            if dst_port != 0 {
+                if let Some(orig) = self.reverse_nat.lock().unwrap().get(&dst_port) {
+                    if let IpAddr::V4(orig_ip) = orig.ip() {
+                        if orig.port() == src_port {
+                            let mut ip_pkt = Ipv4Packet::new_unchecked(&mut buffer);
+                            ip_pkt.set_src_addr(smoltcp::wire::Ipv4Address::from_bytes(&orig_ip.octets()));
+                            rewritten = true;
+                        }
+                    }
+                }
+            }
+
+            if rewritten {
+                let mut ip_pkt = Ipv4Packet::new_unchecked(&mut buffer);
+                ip_pkt.fill_checksum();
+                let src_ip = ip_pkt.src_addr();
+                let dst_ip = ip_pkt.dst_addr();
+                match ip_pkt.next_header() {
+                    IpProtocol::Tcp => {
+                        if let Ok(mut tcp_pkt) = TcpPacket::new_checked(ip_pkt.payload_mut()) {
+                            tcp_pkt.fill_checksum(&src_ip.into(), &dst_ip.into());
+                        }
+                    }
+                    IpProtocol::Udp => {
+                        if let Ok(mut udp_pkt) = UdpPacket::new_checked(ip_pkt.payload_mut()) {
+                            udp_pkt.fill_checksum(&src_ip.into(), &dst_ip.into());
+                        }
+                    }
+                    _ => {}
+                }
+            }
+        } else if version == 6 {
+            let mut dst_port = 0;
+            if let Ok(ip_pkt) = Ipv6Packet::new_checked(&buffer) {
+                if ip_pkt.dst_addr() == smoltcp::wire::Ipv6Address::new(0xfd00, 0, 0, 0, 0, 0, 0, 2) {
+                    dst_port = match ip_pkt.next_header() {
+                        IpProtocol::Tcp => TcpPacket::new_checked(ip_pkt.payload()).map(|p| p.dst_port()).unwrap_or(0),
+                        IpProtocol::Udp => UdpPacket::new_checked(ip_pkt.payload()).map(|p| p.dst_port()).unwrap_or(0),
+                        _ => 0,
+                    };
+                }
+            }
+
+            if dst_port != 0 {
+                if let Some(orig) = self.reverse_nat.lock().unwrap().get(&dst_port) {
+                    if let IpAddr::V6(orig_ip) = orig.ip() {
+                        let mut ip_pkt = Ipv6Packet::new_unchecked(&mut buffer);
+                        ip_pkt.set_src_addr(smoltcp::wire::Ipv6Address::from_bytes(&orig_ip.octets()));
+                        rewritten = true;
+                    }
+                }
+            }
+
+            if rewritten {
+                let mut ip_pkt = Ipv6Packet::new_unchecked(&mut buffer);
+                let src_ip = ip_pkt.src_addr();
+                let dst_ip = ip_pkt.dst_addr();
+                match ip_pkt.next_header() {
+                    IpProtocol::Tcp => {
+                        if let Ok(mut tcp_pkt) = TcpPacket::new_checked(ip_pkt.payload_mut()) {
+                            tcp_pkt.fill_checksum(&src_ip.into(), &dst_ip.into());
+                        }
+                    }
+                    IpProtocol::Udp => {
+                        if let Ok(mut udp_pkt) = UdpPacket::new_checked(ip_pkt.payload_mut()) {
+                            udp_pkt.fill_checksum(&src_ip.into(), &dst_ip.into());
+                        }
+                    }
+                    _ => {}
+                }
+            }
+        }
+
         let _ = self.file.write_all(&buffer);
         result
     }
@@ -156,14 +260,36 @@ async fn run_vpn_loop(
     use etherparse::{SlicedPacket, TransportSlice, NetSlice};
     use std::os::unix::io::{FromRawFd};
 
-    let tun_std = unsafe { std::fs::File::from_raw_fd(fd) };
-    let mut device = TunDevice { file: tun_std, rx_queue: Vec::new() };
+    // Task: Fix fdsan crash by duplicating the FD.
+    // We MUST NOT close the original fd if Java still owns the PFD.
+    let duped_fd = unsafe { libc::dup(fd) };
+    if duped_fd < 0 {
+        return Err(anyhow::anyhow!("Failed to duplicate TUN fd"));
+    }
+
+    let tun_std = unsafe { std::fs::File::from_raw_fd(duped_fd) };
+
+    // Task: Set FD to non-blocking so the loop can check stop_signal even with no traffic.
+    #[cfg(unix)]
+    unsafe {
+        let flags = libc::fcntl(duped_fd, libc::F_GETFL);
+        libc::fcntl(duped_fd, libc::F_SETFL, flags | libc::O_NONBLOCK);
+    }
+
+    let reverse_nat = Arc::new(std::sync::Mutex::new(HashMap::new()));
+    let mut device = TunDevice {
+        file: tun_std,
+        rx_queue: Vec::new(),
+        reverse_nat: reverse_nat.clone()
+    };
 
     let config = Config::new(HardwareAddress::Ip);
     let mut iface = Interface::new(config, &mut device, Instant::now());
     iface.update_ip_addrs(|addrs| {
-        addrs.push(IpCidr::new(IpAddress::v4(10, 0, 0, 2), 32)).unwrap();
-        addrs.push(IpCidr::new(IpAddress::v6(0xfd00, 0, 0, 0, 0, 0, 0, 2), 128)).unwrap();
+        // Phone is 10.1.10.2, Gateway is 10.1.10.1
+        addrs.push(IpCidr::new(IpAddress::v4(10, 1, 10, 1), 32)).unwrap();
+        // Phone is fd00::2, Gateway is fd00::1
+        addrs.push(IpCidr::new(IpAddress::v6(0xfd00, 0, 0, 0, 0, 0, 0, 1), 128)).unwrap();
     });
 
     let mut sockets = SocketSet::new(vec![]);
@@ -188,93 +314,108 @@ async fn run_vpn_loop(
         }
 
         let mut buf = [0u8; 2048];
-        if let Ok(n) = device.file.read(&mut buf) {
-            let mut packet_data = buf[..n].to_vec();
-            if let Ok(sliced) = SlicedPacket::from_ip(&packet_data) {
-                match sliced.transport {
-                    Some(TransportSlice::Udp(udp)) => {
-                        let dst_port = udp.destination_port();
-                        let src_port = udp.source_port();
-                        let dst_ip = match sliced.net.as_ref().unwrap() {
-                            NetSlice::Ipv4(h) => IpAddr::V4(h.header().destination().into()),
-                            NetSlice::Ipv6(h) => IpAddr::V6(h.header().destination().into()),
-                        };
-                        let dst_addr = SocketAddr::new(dst_ip, dst_port);
+        match device.file.read(&mut buf) {
+            Ok(n) if n > 0 => {
+                let mut packet_data = buf[..n].to_vec();
+                if let Ok(sliced) = SlicedPacket::from_ip(&packet_data) {
+                    match sliced.transport {
+                        Some(TransportSlice::Udp(udp)) => {
+                            let dst_port = udp.destination_port();
+                            let src_port = udp.source_port();
 
-                        if dst_port == 53 || dst_port == 853 || dst_port == 443 {
-                             match callback.on_dns_packet(packet_data.clone()) {
-                                 Some(resp) if !resp.is_empty() => {
-                                     let _ = device.file.write_all(&resp);
-                                     continue;
-                                 }
-                                 _ => {
-                                     // Task: Prevent DNS Leak.
-                                     // If this is standard DNS (Port 53) and our proxy failed/returned nothing,
-                                     // we MUST NOT relay it to the original destination (router).
-                                     // We drop it here to force the app to retry or fail securely.
-                                     if dst_port == 53 {
-                                         debug!("DNS Proxy returned nothing for port 53, dropping to prevent leak.");
+                            let dst_ip = if let Some(net) = sliced.net.as_ref() {
+                                match net {
+                                    NetSlice::Ipv4(h) => IpAddr::V4(h.header().destination().into()),
+                                    NetSlice::Ipv6(h) => IpAddr::V6(h.header().destination().into()),
+                                }
+                            } else {
+                                continue;
+                            };
+                            let dst_addr = SocketAddr::new(dst_ip, dst_port);
+
+                            if dst_port == 53 || dst_port == 853 || dst_port == 443 {
+                                 match callback.on_dns_packet(packet_data.clone()) {
+                                     Some(resp) if !resp.is_empty() => {
+                                         let _ = device.file.write_all(&resp);
                                          continue;
                                      }
+                                     _ => {
+                                         if dst_port == 53 {
+                                             debug!("DNS Proxy returned nothing for port 53, dropping to prevent leak.");
+                                             continue;
+                                         }
+                                     }
                                  }
-                             }
-                        }
+                            }
 
-                        let relay = if let Some(r) = udp_relays.get(&src_port) {
-                            r.clone()
-                        } else {
-                            match create_protected_udp_socket(dst_addr, &protector) {
-                                Ok(s) => {
-                                    let s_arc = Arc::new(s);
-                                    udp_relays.insert(src_port, s_arc.clone());
-                                    let tx_clone = tx_tun.clone();
-                                    let s_clone = s_arc.clone();
-                                    tokio::spawn(async move {
-                                        let mut resp_buf = [0u8; 2048];
-                                        while let Ok((len, addr)) = s_clone.recv_from(&mut resp_buf).await {
-                                            if let Some(p) = build_udp_response_packet(addr, src_port, &resp_buf[..len]) {
-                                                let _ = tx_clone.send(p).await;
+                            let relay = if let Some(r) = udp_relays.get(&src_port) {
+                                r.clone()
+                            } else {
+                                match create_protected_udp_socket(dst_addr, &protector) {
+                                    Ok(s) => {
+                                        let s_arc = Arc::new(s);
+                                        udp_relays.insert(src_port, s_arc.clone());
+                                        reverse_nat.lock().unwrap().insert(src_port, dst_addr);
+
+                                        let tx_clone = tx_tun.clone();
+                                        let s_clone = s_arc.clone();
+                                        let rn_clone = reverse_nat.clone();
+                                        tokio::spawn(async move {
+                                            let mut resp_buf = [0u8; 2048];
+                                            while let Ok((len, addr)) = s_clone.recv_from(&mut resp_buf).await {
+                                                if let Some(p) = build_udp_response_packet(addr, src_port, &resp_buf[..len]) {
+                                                    let _ = tx_clone.send(p).await;
+                                                }
                                             }
+                                            rn_clone.lock().unwrap().remove(&src_port);
+                                        });
+                                        s_arc
+                                    }
+                                    Err(_) => continue,
+                                }
+                            };
+                            let _ = relay.send_to(udp.payload(), dst_addr).await;
+                        }
+                        Some(TransportSlice::Tcp(tcp_hdr)) => {
+                            let src_port = tcp_hdr.source_port();
+                            if let Some(net) = sliced.net.as_ref() {
+                                match net {
+                                    NetSlice::Ipv4(h) => {
+                                        let dst_ip = IpAddr::V4(h.header().destination().into());
+                                        let dst_addr = SocketAddr::new(dst_ip, tcp_hdr.destination_port());
+                                        if tcp_hdr.syn() {
+                                            if original_destinations.len() < MAX_TCP_SESSIONS {
+                                                original_destinations.insert(src_port, dst_addr);
+                                                reverse_nat.lock().unwrap().insert(src_port, dst_addr);
+                                            } else { continue; }
                                         }
-                                    });
-                                    s_arc
+                                        let mut ip_pkt = Ipv4Packet::new_unchecked(&mut packet_data);
+                                        ip_pkt.set_dst_addr(Ipv4Address::new(10, 1, 10, 1));
+                                    }
+                                    NetSlice::Ipv6(h) => {
+                                        let dst_ip = IpAddr::V6(h.header().destination().into());
+                                        let dst_addr = SocketAddr::new(dst_ip, tcp_hdr.destination_port());
+                                        if tcp_hdr.syn() {
+                                            if original_destinations.len() < MAX_TCP_SESSIONS {
+                                                original_destinations.insert(src_port, dst_addr);
+                                                reverse_nat.lock().unwrap().insert(src_port, dst_addr);
+                                            } else { continue; }
+                                        }
+                                        let mut ip_pkt = Ipv6Packet::new_unchecked(&mut packet_data);
+                                        ip_pkt.set_dst_addr(Ipv6Address::new(0xfd00, 0, 0, 0, 0, 0, 0, 1));
+                                    }
                                 }
-                                Err(_) => continue,
-                            }
-                        };
-                        let _ = relay.send_to(udp.payload(), dst_addr).await;
-                    }
-                    Some(TransportSlice::Tcp(tcp_hdr)) => {
-                        let src_port = tcp_hdr.source_port();
-                        match sliced.net.as_ref().unwrap() {
-                            NetSlice::Ipv4(h) => {
-                                let dst_ip = IpAddr::V4(h.header().destination().into());
-                                let dst_addr = SocketAddr::new(dst_ip, tcp_hdr.destination_port());
-                                if tcp_hdr.syn() {
-                                    if original_destinations.len() < MAX_TCP_SESSIONS {
-                                        original_destinations.insert(src_port, dst_addr);
-                                    } else { continue; }
-                                }
-                                let mut ip_pkt = Ipv4Packet::new_unchecked(&mut packet_data);
-                                ip_pkt.set_dst_addr(Ipv4Address::new(10, 0, 0, 2));
-                            }
-                            NetSlice::Ipv6(h) => {
-                                let dst_ip = IpAddr::V6(h.header().destination().into());
-                                let dst_addr = SocketAddr::new(dst_ip, tcp_hdr.destination_port());
-                                if tcp_hdr.syn() {
-                                    if original_destinations.len() < MAX_TCP_SESSIONS {
-                                        original_destinations.insert(src_port, dst_addr);
-                                    } else { continue; }
-                                }
-                                let mut ip_pkt = Ipv6Packet::new_unchecked(&mut packet_data);
-                                ip_pkt.set_dst_addr(Ipv6Address::new(0xfd00, 0, 0, 0, 0, 0, 0, 2));
+                                device.rx_queue.push(packet_data);
                             }
                         }
-                        device.rx_queue.push(packet_data);
+                        _ => {}
                     }
-                    _ => {}
                 }
             }
+            Err(ref e) if e.kind() == std::io::ErrorKind::WouldBlock => {
+                // No data, yield
+            }
+            _ => {}
         }
 
         iface.poll(now, &mut device, &mut sockets);
@@ -347,6 +488,7 @@ async fn run_vpn_loop(
         for handle in handles_to_remove {
             if let Some(relay) = tcp_relays.remove(&handle) {
                 original_destinations.remove(&relay.client_port);
+                reverse_nat.lock().unwrap().remove(&relay.client_port);
             }
             sockets.remove(handle);
         }
@@ -375,7 +517,6 @@ async fn create_protected_tcp_stream(addr: SocketAddr, protector: &Box<dyn Socke
         return Err(anyhow::anyhow!("Protection failed"));
     }
 
-    // Non-blocking connect using socket2
     socket.set_nonblocking(true)?;
     match socket.connect(&addr.into()) {
         Ok(_) => {}
@@ -405,7 +546,7 @@ fn build_udp_response_packet(src_addr: std::net::SocketAddr, dst_port: u16, payl
     use etherparse::PacketBuilder;
     match src_addr.ip() {
         IpAddr::V4(src_ip) => {
-            let builder = PacketBuilder::ipv4(src_ip.octets(), [10, 0, 0, 2], 64).udp(src_addr.port(), dst_port);
+            let builder = PacketBuilder::ipv4(src_ip.octets(), [10, 1, 10, 2], 64).udp(src_addr.port(), dst_port);
             let mut result = Vec::with_capacity(builder.size(payload.len()));
             builder.write(&mut result, payload).ok()?;
             Some(result)

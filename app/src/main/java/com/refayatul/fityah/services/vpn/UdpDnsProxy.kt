@@ -1,12 +1,15 @@
 package com.refayatul.fityah.services.vpn
 
 import android.content.Context
+import android.util.Log
 import com.refayatul.fityah.data.models.DnsServer
 import com.refayatul.fityah.data.models.DnsType
 import com.refayatul.fityah.utils.DnsCache
+import okhttp3.OkHttpClient
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.chromium.net.CronetEngine
@@ -32,60 +35,122 @@ class UdpDnsProxy(private val service: DnsVpnService) {
     }
     
     private val cronetExecutor: Executor = Executors.newFixedThreadPool(4)
+    private val bootstrapClient = OkHttpClient.Builder()
+        .connectTimeout(5, TimeUnit.SECONDS)
+        .readTimeout(5, TimeUnit.SECONDS)
+        .build()
 
     private fun getSocket(): DatagramSocket {
         val s = udpSocket
         if (s != null && !s.isClosed) return s
         
         val newSocket = DatagramSocket().apply {
-            service.protect(this) // Use VpnService.protect()
-            soTimeout = 5000
+            // Task: Increase receive timeout for slow custom DNS (e.g. NextDNS from BD)
+            service.protect(this) 
+            soTimeout = 8000 
         }
         udpSocket = newSocket
         return newSocket
     }
 
     suspend fun resolve(query: ByteArray, servers: List<DnsServer>): ByteArray? = withContext(Dispatchers.IO) {
-        // ... (rest of resolve logic stays same, just uses getSocket())
         val socket = getSocket()
         
         // 1. Check local cache
-        DnsCache.get(query)?.let { return@withContext it }
+        DnsCache.get(query)?.let { 
+            Log.d("DnsProxy", "Cache hit for query")
+            return@withContext it 
+        }
 
         // 2. Try each server in order
         for (server in servers) {
-            if (!server.isEnabled) continue
+            // Task: Safety check - if ALL servers are somehow disabled in config, 
+            // force them enabled for this session to prevent total blackout.
+            val effectiveEnabled = if (servers.none { it.isEnabled }) true else server.isEnabled
             
+            if (!effectiveEnabled) {
+                Log.d("DnsProxy", "Server ${server.address} is disabled, skipping")
+                continue
+            }
+            
+            Log.d("DnsProxy", "Trying ${server.type} server: ${server.address}")
             val result = try {
                 when (server.type) {
-                    DnsType.DOH, DnsType.DOH3 -> resolveSecure(query, server.address)
+                    DnsType.DOH, DnsType.DOH3 -> {
+                        // Task: Resolve hostname with bootstrap if needed
+                        val resolvedUrl = resolveHostnameInUrl(server.address)
+                        resolveSecure(query, resolvedUrl)
+                    }
                     DnsType.PLAIN -> resolvePlain(query, server.address, socket)
                 }
             } catch (e: Exception) {
+                Log.e("DnsProxy", "Resolution error via ${server.address}: ${e.message}")
                 null
             }
             
             if (result != null) {
+                Log.d("DnsProxy", "Success via ${server.address}")
                 DnsCache.put(query, result)
                 return@withContext result
             }
         }
+        Log.w("DnsProxy", "All DNS servers failed")
         null
     }
 
     private fun resolvePlain(query: ByteArray, upstream: String, socket: DatagramSocket): ByteArray? {
         return try {
-            val address = InetAddress.getByName(upstream)
+            // Task: Bootstrap hostname to IP if needed for plain DNS
+            val targetIp = resolveHostnameInUrl(upstream)
+            Log.d("DnsProxy", "Plain resolution using IP: $targetIp (original: $upstream)")
+            val address = InetAddress.getByName(targetIp)
             val packet = DatagramPacket(query, query.size, address, 53)
             socket.send(packet)
 
-            val buffer = ByteArray(2048)
+            val buffer = ByteArray(4096) // Larger buffer
             val responsePacket = DatagramPacket(buffer, buffer.size)
             socket.receive(responsePacket)
             
+            Log.d("DnsProxy", "Plain resolution succeeded for $upstream")
             responsePacket.data.copyOfRange(0, responsePacket.length)
         } catch (e: Exception) {
+            Log.e("DnsProxy", "Plain resolution failed for $upstream: ${e.message}")
             null
+        }
+    }
+
+    private fun resolveHostnameInUrl(url: String): String {
+        val hostname = if (url.startsWith("https://")) {
+            url.substringAfter("https://").substringBefore("/")
+        } else {
+            url
+        }
+        
+        if (hostname.matches(Regex("^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+$"))) return url
+        
+        val ip = when {
+            hostname == "dns.quad9.net" -> "9.9.9.9"
+            hostname == "cloudflare-dns.com" || hostname == "1.1.1.1.cloudflare-dns.com" -> "1.1.1.1"
+            hostname == "dns.google" -> "8.8.8.8"
+            hostname == "dns.adguard-dns.com" -> "94.140.14.14"
+            hostname.endsWith(".nextdns.io") -> "45.90.28.0"
+            else -> {
+                // Task: Resolve via Google DNS bypass to break deadlock
+                try {
+                    Log.d("DnsProxy", "Bootstrapping unknown hostname: $hostname")
+                    val resolver = InetAddress.getAllByName(hostname)
+                    resolver.firstOrNull { it is java.net.Inet4Address }?.hostAddress
+                } catch (e: Exception) {
+                    Log.e("DnsProxy", "Bootstrap failed for $hostname: ${e.message}")
+                    null
+                }
+            }
+        }
+        
+        return if (ip != null) {
+            if (url.startsWith("https://")) url.replace(hostname, ip) else ip
+        } else {
+            url
         }
     }
 
@@ -93,13 +158,11 @@ class UdpDnsProxy(private val service: DnsVpnService) {
         try {
             udpSocket?.close()
             udpSocket = null
-            // CronetEngine doesn't have a simple close, but dropping the reference is usually enough
-            // unless we want to call shutdown() which might affect other parts of the app.
         } catch (e: Exception) {}
     }
 
     private suspend fun resolveSecure(query: ByteArray, url: String): ByteArray? = suspendCoroutine { continuation ->
-        val callback = object : UrlRequest.Callback() {
+        val callback = object : CronetHelper() {
             private val responseBuffer = ByteBuffer.allocateDirect(4096)
             private var totalData = ByteArray(0)
 
@@ -124,11 +187,12 @@ class UdpDnsProxy(private val service: DnsVpnService) {
                 continuation.resume(totalData)
             }
 
-            override fun onFailed(request: UrlRequest, info: UrlResponseInfo, error: CronetException) {
+            override fun onFailedSafe(request: UrlRequest?, info: UrlResponseInfo?, error: CronetException?) {
+                Log.e("DnsProxy", "Secure resolution failed: ${error?.message}")
                 continuation.resume(null)
             }
 
-            override fun onCanceled(request: UrlRequest, info: UrlResponseInfo) {
+            override fun onCanceledSafe(request: UrlRequest?, info: UrlResponseInfo?) {
                 continuation.resume(null)
             }
         }
@@ -137,7 +201,9 @@ class UdpDnsProxy(private val service: DnsVpnService) {
             .setHttpMethod("POST")
             .addHeader("Content-Type", "application/dns-message")
             .addHeader("Accept", "application/dns-message")
-            .addHeader("User-Agent", "Fityah/1.0 (Privacy-First DNS)") // Hardened User-Agent
+            // Task: Set high priority for DNS
+            .setPriority(UrlRequest.Builder.REQUEST_PRIORITY_HIGHEST)
+            .addHeader("User-Agent", "Fityah/1.0 (Privacy-First DNS)") 
             .setUploadDataProvider(org.chromium.net.UploadDataProviders.create(query), cronetExecutor)
             .build()
         

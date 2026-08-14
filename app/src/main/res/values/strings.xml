@@ -1031,6 +1031,8 @@
     <string name="vpn_safesearch_desc">Force SafeSearch on Google, Bing, and DuckDuckGo</string>
     <string name="vpn_allowlist">Allowlist</string>
     <string name="vpn_allowlist_desc">Manually allow specific domains</string>
+    <string name="vpn_lock_private_dns">Force Private DNS Off (Shizuku)</string>
+    <string name="vpn_lock_private_dns_desc">Prevents bypass via system Private DNS settings by forcing it to OFF. Requires Shizuku.</string>
     <string name="vpn_refresh_blocklists">Refresh Blocklists</string>
     <string name="vpn_add_source">Add Blocklist URL</string>
 

@@ -340,6 +340,7 @@ dependencies = [
  "android_logger",
  "anyhow",
  "etherparse",
+ "libc",
  "log",
  "mio",
  "smoltcp",

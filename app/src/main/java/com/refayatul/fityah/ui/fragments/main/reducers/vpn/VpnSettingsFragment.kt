@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.net.VpnService
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -60,9 +61,17 @@ class VpnSettingsFragment : Fragment() {
             val settings = dataStoreManager.settings.first()
             val config = settings.vpnConfig
             
+            // Task: Update UI without triggering listeners
+            binding.switchVpnEnable.setOnCheckedChangeListener(null)
             binding.switchVpnEnable.isChecked = config.isEnabled
+            
+            binding.switchLocalBlocklist.setOnCheckedChangeListener(null)
             binding.switchLocalBlocklist.isChecked = config.useLocalBlocklist
+            
+            binding.switchSafesearch.setOnCheckedChangeListener(null)
             binding.switchSafesearch.isChecked = config.forcedSafeSearch
+            
+            binding.switchLockPrivateDns.setOnCheckedChangeListener(null)
             binding.switchLockPrivateDns.isChecked = config.lockPrivateDns
             
             val serverCount = config.dnsServers.size
@@ -77,19 +86,28 @@ class VpnSettingsFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        // Clear listeners first to avoid loop during refresh
-        binding.switchVpnEnable.setOnCheckedChangeListener(null)
-        binding.switchLocalBlocklist.setOnCheckedChangeListener(null)
-        binding.switchSafesearch.setOnCheckedChangeListener(null)
-        binding.switchLockPrivateDns.setOnCheckedChangeListener(null)
-
         binding.switchVpnEnable.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                prepareVpn()
-            } else {
-                stopVpnService()
+            viewLifecycleOwner.lifecycleScope.launch {
+                Log.d("VpnUI", "Switch toggled: $isChecked")
+                
+                // Task: Read current to check if it's already in the desired state
+                val current = dataStoreManager.settings.first().vpnConfig
+                if (current.isEnabled == isChecked) {
+                    Log.d("VpnUI", "State already matches, skipping redundant call")
+                    return@launch
+                }
+
+                val newConfig = current.copy(isEnabled = isChecked)
+                dataStoreManager.updateVpnConfig(newConfig)
+
+                if (isChecked) {
+                    Log.d("VpnUI", "Starting VPN service")
+                    prepareVpn()
+                } else {
+                    Log.d("VpnUI", "Stopping VPN service")
+                    stopVpnService()
+                }
             }
-            updateConfig()
         }
 
         binding.switchLocalBlocklist.setOnCheckedChangeListener { _, _ -> updateConfig() }
@@ -102,6 +120,7 @@ class VpnSettingsFragment : Fragment() {
                 } else {
                     Toast.makeText(requireContext(), "Shizuku not available", Toast.LENGTH_SHORT).show()
                     binding.switchLockPrivateDns.isChecked = false
+                    return@setOnCheckedChangeListener
                 }
             }
             updateConfig()
@@ -141,6 +160,17 @@ class VpnSettingsFragment : Fragment() {
                 putExtra("fragment", ExemptAppsFragment.FRAGMENT_ID)
             }
             startActivity(intent)
+        }
+
+        binding.btnStopVpn.setOnClickListener {
+            viewLifecycleOwner.lifecycleScope.launch {
+                Log.d("VpnUI", "Force Stop clicked")
+                val current = dataStoreManager.settings.first().vpnConfig
+                dataStoreManager.updateVpnConfig(current.copy(isEnabled = false))
+                stopVpnService()
+                binding.switchVpnEnable.isChecked = false
+                Toast.makeText(requireContext(), "VPN Stopped", Toast.LENGTH_SHORT).show()
+            }
         }
 
         binding.btnTestRust.setOnClickListener {
@@ -186,6 +216,7 @@ class VpnSettingsFragment : Fragment() {
     private fun startVpnService() {
         val intent = Intent(requireContext(), DnsVpnService::class.java).apply {
             action = DnsVpnService.ACTION_START
+            putExtra("EXTRA_ENABLED", true)
         }
         requireContext().startService(intent)
     }
