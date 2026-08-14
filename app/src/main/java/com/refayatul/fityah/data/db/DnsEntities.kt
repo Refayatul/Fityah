@@ -30,5 +30,6 @@ data class DnsRequestLogEntity(
     val domain: String,
     val appName: String,
     val timestamp: Long = System.currentTimeMillis(),
-    val isBlocked: Boolean
+    val isBlocked: Boolean,
+    val trackerName: String? = null
 )

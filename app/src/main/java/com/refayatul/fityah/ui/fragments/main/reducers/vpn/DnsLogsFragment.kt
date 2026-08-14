@@ -76,8 +76,14 @@ class DnsLogsFragment : Fragment() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val log = logs[position]
             val time = dateFormat.format(Date(log.timestamp))
-            holder.textDomain.text = log.domain
-            holder.textApp.text = "${log.appName} • $time"
+            
+            if (log.trackerName != null) {
+                holder.textDomain.text = "⚠️ ${log.trackerName}"
+                holder.textApp.text = "${log.domain} • ${log.appName} • $time"
+            } else {
+                holder.textDomain.text = log.domain
+                holder.textApp.text = "${log.appName} • $time"
+            }
             
             if (log.isBlocked) {
                 holder.textDomain.setTextColor(requireContext().getColor(android.R.color.holo_red_dark))

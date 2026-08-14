@@ -21,7 +21,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         AllowedDomainEntity::class,
         DnsRequestLogEntity::class
     ],
-    version = 12,
+    version = 13,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

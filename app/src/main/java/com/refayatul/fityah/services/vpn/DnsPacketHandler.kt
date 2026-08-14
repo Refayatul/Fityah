@@ -16,6 +16,7 @@ class DnsPacketHandler(private val context: Context, private val proxy: UdpDnsPr
     private val blocklistManager = BlocklistManager(context)
     private val db = com.refayatul.fityah.data.db.AppDatabase.getInstance(context)
     private val dnsDao = db.dnsDao()
+    private val trackerManager = com.refayatul.fityah.utils.TrackerManager(context)
     
     suspend fun handlePacket(packet: ByteBuffer, srcIp: String, srcPort: Int): ByteBuffer? = withContext(Dispatchers.IO) {
         val buffer = packet.array()
@@ -110,18 +111,23 @@ class DnsPacketHandler(private val context: Context, private val proxy: UdpDnsPr
             Log.w("AppAttribution", "Failed to attribute query for $domain", e)
         }
 
+        val trackerName = trackerManager.getTrackerName(domain)
+        if (trackerName != null) {
+            Log.i("DnsPacketHandler", "MATCHED TRACKER: $trackerName for domain $domain")
+        }
+
         if (version == 4 && config.forcedSafeSearch) {
             val safeIp = getSafeSearchIp(domain)
             if (safeIp != null) {
                 Log.d("DnsPacketHandler", "Logging SafeSearch: $domain")
-                dnsDao.insertLog(DnsRequestLogEntity(domain = domain, appName = attributedAppName, isBlocked = false))
+                dnsDao.insertLog(DnsRequestLogEntity(domain = domain, appName = attributedAppName, isBlocked = false, trackerName = trackerName))
                 return createDnsAResponse(buffer, limit, ipLen, udpStart, safeIp)
             }
         }
 
         if (config.useLocalBlocklist && blocklistManager.isDomainBlocked(domain)) {
             Log.d("DnsPacketHandler", "Logging Blocked: $domain")
-            dnsDao.insertLog(DnsRequestLogEntity(domain = domain, appName = attributedAppName, isBlocked = true))
+            dnsDao.insertLog(DnsRequestLogEntity(domain = domain, appName = attributedAppName, isBlocked = true, trackerName = trackerName))
             return createNxDomainResponse(buffer, limit, ipLen, udpStart, version)
         }
         
@@ -136,7 +142,7 @@ class DnsPacketHandler(private val context: Context, private val proxy: UdpDnsPr
         }
         
         Log.d("DnsPacketHandler", "Logging Allowed: $domain")
-        dnsDao.insertLog(DnsRequestLogEntity(domain = domain, appName = attributedAppName, isBlocked = false))
+        dnsDao.insertLog(DnsRequestLogEntity(domain = domain, appName = attributedAppName, isBlocked = false, trackerName = trackerName))
         return createResponsePacket(buffer, ipLen, udpStart, dnsResponse, version)
     }
 
