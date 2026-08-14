@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.refayatul.fityah.rustcore"
-    compileSdk = 35
+    compileSdk = 37
     ndkVersion = "30.0.15729638"
 
     defaultConfig {
@@ -82,5 +82,5 @@ project.tasks.configureEach {
 
 dependencies {
     implementation(libs.androidx.core.ktx)
-    implementation(libs.jna)
+    api("net.java.dev.jna:jna:${libs.versions.jna.get()}@aar")
 }

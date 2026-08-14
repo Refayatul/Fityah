@@ -34,6 +34,13 @@ class CrashLogActivity : AppCompatActivity() {
 
         binding.tvCrashLogs.text = content
 
+        binding.btnCopy.setOnClickListener {
+            val clipboard = getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+            val clip = android.content.ClipData.newPlainText("Fityah Crash Logs", content)
+            clipboard.setPrimaryClip(clip)
+            android.widget.Toast.makeText(this, "Logs copied to clipboard", android.widget.Toast.LENGTH_SHORT).show()
+        }
+
         binding.btnShare.setOnClickListener {
             val intent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"

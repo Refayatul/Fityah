@@ -56,6 +56,8 @@ class ReelsCountTracker {
     private val seenReelsCache = mutableMapOf<String, LruCache<String, Boolean>>()
 
     private var ignored = listOf<String>()
+    private var isSetup = false
+
     fun setup(
         service: BaseBlockingService,
         overlayManager: ReelsOverlayManager,
@@ -87,19 +89,27 @@ class ReelsCountTracker {
                 todayCount = 0
             }
         }
+        isSetup = true
     }
 
     fun onEvent(event: AccessibilityEvent?, dynamicComparator: String?) {
+        if (event == null) return
+        if (!isSetup) return
+        
+        val packageName = try {
+            event.packageName?.toString()
+        } catch (e: Exception) {
+            null
+        } ?: return
 
-        if (event == null || ignored.contains(event.packageName.toString())) return
+        if (ignored.contains(packageName)) return
 
         try {
-            val pkg = event.packageName?.toString() ?: return
-            val data = reelData[pkg]
-
+            val data = reelData[packageName]
+            
             if (data != null) {
                 if (dynamicComparator == null) {
-                    lastDynamicText.remove(pkg)
+                    lastDynamicText.remove(packageName)
                     hideReelCounter()
                     return
                 }
@@ -114,7 +124,7 @@ class ReelsCountTracker {
                 }
 
                 checkForReelProgression(
-                    pkg,
+                    packageName,
                     dynamicComparator,
                     data.deduplicateComparators,
                     data.initialComparator
@@ -126,7 +136,9 @@ class ReelsCountTracker {
 
 
         } catch (error: Exception) {
-            crashLogger.logNonFatalError(error)
+            if (::crashLogger.isInitialized) {
+                crashLogger.logNonFatalError(error)
+            }
         }
     }
 

@@ -83,32 +83,32 @@ class UdpDnsProxy(private val service: DnsVpnService) {
             private val responseBuffer = ByteBuffer.allocateDirect(4096)
             private var totalData = ByteArray(0)
 
-            override fun onRedirectReceived(request: UrlRequest?, info: UrlResponseInfo?, newLocationUrl: String?) {
-                request?.followRedirect()
+            override fun onRedirectReceived(request: UrlRequest, info: UrlResponseInfo, newLocationUrl: String) {
+                request.followRedirect()
             }
 
-            override fun onResponseStarted(request: UrlRequest?, info: UrlResponseInfo?) {
-                request?.read(responseBuffer)
+            override fun onResponseStarted(request: UrlRequest, info: UrlResponseInfo) {
+                request.read(responseBuffer)
             }
 
-            override fun onReadCompleted(request: UrlRequest?, info: UrlResponseInfo?, byteBuffer: ByteBuffer?) {
+            override fun onReadCompleted(request: UrlRequest, info: UrlResponseInfo, byteBuffer: ByteBuffer) {
                 responseBuffer.flip()
                 val bytes = ByteArray(responseBuffer.remaining())
                 responseBuffer.get(bytes)
                 totalData += bytes
                 responseBuffer.clear()
-                request?.read(responseBuffer)
+                request.read(responseBuffer)
             }
 
-            override fun onSucceeded(request: UrlRequest?, info: UrlResponseInfo?) {
+            override fun onSucceeded(request: UrlRequest, info: UrlResponseInfo) {
                 continuation.resume(totalData)
             }
 
-            override fun onFailed(request: UrlRequest?, info: UrlResponseInfo?, error: CronetException?) {
+            override fun onFailed(request: UrlRequest, info: UrlResponseInfo, error: CronetException) {
                 continuation.resume(null)
             }
 
-            override fun onCanceled(request: UrlRequest?, info: UrlResponseInfo?) {
+            override fun onCanceled(request: UrlRequest, info: UrlResponseInfo) {
                 continuation.resume(null)
             }
         }

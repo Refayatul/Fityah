@@ -42,7 +42,7 @@ androidComponents {
 
 android {
     namespace = "com.refayatul.fityah"
-    compileSdk = 35
+    compileSdk = 37
     ndkVersion = "30.0.15729638"
     flavorDimensions += "version"
 
@@ -54,7 +54,7 @@ android {
     defaultConfig {
         applicationId = "com.refayatul.fityah"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 37
         versionCode = 4
         versionName = "4"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

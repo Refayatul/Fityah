@@ -115,9 +115,11 @@ class DnsServersFragment : Fragment() {
     ) : RecyclerView.Adapter<DnsAdapter.ViewHolder>() {
 
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            val text: TextView = view.findViewById(android.R.id.text1)
+            val textAddress: TextView = view.findViewById(R.id.text_dns_address)
+            val btnRemove: View = view.findViewById(R.id.btn_remove)
+
             init {
-                view.setOnClickListener {
+                btnRemove.setOnClickListener {
                     val pos = adapterPosition
                     if (pos != RecyclerView.NO_POSITION) {
                         MaterialAlertDialogBuilder(requireContext())
@@ -130,18 +132,23 @@ class DnsServersFragment : Fragment() {
                             .show()
                     }
                 }
+                
+                view.setOnClickListener {
+                    // Also allow clicking the whole item to remove
+                    btnRemove.performClick()
+                }
             }
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context)
-                .inflate(android.R.layout.simple_list_item_1, parent, false)
+                .inflate(R.layout.item_dns_server, parent, false)
             return ViewHolder(view)
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val item = list[position]
-            holder.text.text = String.format("[%s] %s", item.type.name, item.address)
+            holder.textAddress.text = String.format("[%s] %s", item.type.name, item.address)
         }
 
         override fun getItemCount() = list.size
