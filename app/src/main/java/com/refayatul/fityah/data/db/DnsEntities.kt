@@ -23,3 +23,12 @@ data class BlockedDomainEntity(
 data class AllowedDomainEntity(
     @PrimaryKey val domain: String
 )
+
+@Entity(tableName = "dns_request_logs")
+data class DnsRequestLogEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val domain: String,
+    val appName: String,
+    val timestamp: Long = System.currentTimeMillis(),
+    val isBlocked: Boolean
+)

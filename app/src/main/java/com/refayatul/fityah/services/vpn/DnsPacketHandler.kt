@@ -1,6 +1,9 @@
 package com.refayatul.fityah.services.vpn
 
 import android.content.Context
+import android.util.Log
+import com.refayatul.fityah.data.db.DnsDao
+import com.refayatul.fityah.data.db.DnsRequestLogEntity
 import com.refayatul.fityah.data.models.VpnConfig
 import com.refayatul.fityah.utils.BlocklistManager
 import kotlinx.coroutines.Dispatchers
@@ -11,8 +14,10 @@ import java.util.Locale
 
 class DnsPacketHandler(private val context: Context, private val proxy: UdpDnsProxy, private val config: VpnConfig) {
     private val blocklistManager = BlocklistManager(context)
+    private val db = com.refayatul.fityah.data.db.AppDatabase.getInstance(context)
+    private val dnsDao = db.dnsDao()
     
-    suspend fun handlePacket(packet: ByteBuffer): ByteBuffer? = withContext(Dispatchers.IO) {
+    suspend fun handlePacket(packet: ByteBuffer, srcIp: String, srcPort: Int): ByteBuffer? = withContext(Dispatchers.IO) {
         val buffer = packet.array()
         val limit = packet.limit()
         
@@ -20,15 +25,15 @@ class DnsPacketHandler(private val context: Context, private val proxy: UdpDnsPr
         
         val version = (buffer[0].toInt() and 0xF0) shr 4
         if (version == 4) {
-            handleIpv4(buffer, limit)
+            handleIpv4(buffer, limit, srcIp, srcPort)
         } else if (version == 6) {
-            handleIpv6(buffer, limit)
+            handleIpv6(buffer, limit, srcIp, srcPort)
         } else {
             null
         }
     }
 
-    private suspend fun handleIpv4(buffer: ByteArray, limit: Int): ByteBuffer? {
+    private suspend fun handleIpv4(buffer: ByteArray, limit: Int, srcIp: String, srcPort: Int): ByteBuffer? {
         val ipHeaderLength = (buffer[0].toInt() and 0x0F) * 4
         val protocol = buffer[9].toInt() and 0xFF
         val dstIp = String.format(Locale.US, "%d.%d.%d.%d", 
@@ -44,8 +49,9 @@ class DnsPacketHandler(private val context: Context, private val proxy: UdpDnsPr
                 val dnsDataLength = limit - dnsDataStart
                 val domain = parseDnsQuery(buffer, dnsDataStart, dnsDataLength) ?: return null
                 
-                return processDomain(domain, buffer, limit, ipHeaderLength, udpHeaderStart, 4)
+                return processDomain(domain, buffer, limit, ipHeaderLength, udpHeaderStart, 4, srcIp, srcPort)
             }
+// ...
             
             // Task 2: Block DoT over UDP on port 853
             if (dstPort == 853 && BlocklistManager.DOH_IPS.contains(dstIp)) {
@@ -64,7 +70,7 @@ class DnsPacketHandler(private val context: Context, private val proxy: UdpDnsPr
         return null
     }
 
-    private suspend fun handleIpv6(buffer: ByteArray, limit: Int): ByteBuffer? {
+    private suspend fun handleIpv6(buffer: ByteArray, limit: Int, srcIp: String, srcPort: Int): ByteBuffer? {
         if (limit < 48) return null
         val protocol = buffer[6].toInt() and 0xFF
         
@@ -75,35 +81,62 @@ class DnsPacketHandler(private val context: Context, private val proxy: UdpDnsPr
                 val dnsDataStart = 48
                 val dnsDataLength = limit - dnsDataStart
                 val domain = parseDnsQuery(buffer, dnsDataStart, dnsDataLength) ?: return null
-                return processDomain(domain, buffer, limit, 40, udpHeaderStart, 6)
+                return processDomain(domain, buffer, limit, 40, udpHeaderStart, 6, srcIp, srcPort)
             }
         }
         
         return null
     }
 
-    private suspend fun processDomain(domain: String, buffer: ByteArray, limit: Int, ipLen: Int, udpStart: Int, version: Int): ByteBuffer? {
+    private suspend fun processDomain(domain: String, buffer: ByteArray, limit: Int, ipLen: Int, udpStart: Int, version: Int, srcIp: String, srcPort: Int): ByteBuffer? {
+        Log.d("DnsPacketHandler", "Processing domain: $domain from $srcIp:$srcPort")
+        // App Attribution Logic
+        var attributedAppName = "System / Unknown"
+        try {
+            val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as? android.net.ConnectivityManager
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q && cm != null) {
+                val local = java.net.InetSocketAddress(srcIp, srcPort)
+                val remote = java.net.InetSocketAddress(if (version == 4) "10.1.10.1" else "fd00:fityah::1", 53)
+                val uid = cm.getConnectionOwnerUid(17 /* UDP */, local, remote)
+                if (uid != android.os.Process.INVALID_UID) {
+                    val packageManager = context.packageManager
+                    val packages = packageManager.getPackagesForUid(uid)
+                    attributedAppName = packages?.firstOrNull()?.let { pkg ->
+                        try { packageManager.getApplicationLabel(packageManager.getApplicationInfo(pkg, 0)).toString() } catch (e: Exception) { pkg }
+                    } ?: "System / Unknown"
+                }
+            }
+        } catch (e: Exception) {
+            Log.w("AppAttribution", "Failed to attribute query for $domain", e)
+        }
+
         if (version == 4 && config.forcedSafeSearch) {
             val safeIp = getSafeSearchIp(domain)
             if (safeIp != null) {
+                Log.d("DnsPacketHandler", "Logging SafeSearch: $domain")
+                dnsDao.insertLog(DnsRequestLogEntity(domain = domain, appName = attributedAppName, isBlocked = false))
                 return createDnsAResponse(buffer, limit, ipLen, udpStart, safeIp)
             }
         }
 
         if (config.useLocalBlocklist && blocklistManager.isDomainBlocked(domain)) {
+            Log.d("DnsPacketHandler", "Logging Blocked: $domain")
+            dnsDao.insertLog(DnsRequestLogEntity(domain = domain, appName = attributedAppName, isBlocked = true))
             return createNxDomainResponse(buffer, limit, ipLen, udpStart, version)
         }
         
         val dnsDataStart = udpStart + 8
         val query = buffer.copyOfRange(dnsDataStart, limit)
         
-        // Final Fix: Resolve via proxy with logging
         val dnsResponse = proxy.resolve(query, config.dnsServers)
         
         if (dnsResponse == null) {
+            Log.w("DnsPacketHandler", "No response for $domain")
             return null
         }
         
+        Log.d("DnsPacketHandler", "Logging Allowed: $domain")
+        dnsDao.insertLog(DnsRequestLogEntity(domain = domain, appName = attributedAppName, isBlocked = false))
         return createResponsePacket(buffer, ipLen, udpStart, dnsResponse, version)
     }
 

@@ -41,13 +41,13 @@ class DnsVpnService : VpnService() {
     private var dnsHandler: DnsPacketHandler? = null
 
     private val dnsCallback = object : uniffi.fityah_rust.DnsCallback {
-        override fun onDnsPacket(packet: ByteArray): ByteArray? {
+        override fun onDnsPacket(packet: ByteArray, srcIp: String, srcPort: UShort): ByteArray? {
             val byteBuffer = ByteBuffer.wrap(packet)
             byteBuffer.limit(packet.size)
             
             val handler = dnsHandler ?: return null
             
-            val response = runBlocking { handler.handlePacket(byteBuffer) }
+            val response = runBlocking { handler.handlePacket(byteBuffer, srcIp, srcPort.toInt()) }
             return response?.array()
         }
     }

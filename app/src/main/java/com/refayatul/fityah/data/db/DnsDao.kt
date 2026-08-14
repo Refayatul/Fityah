@@ -43,4 +43,13 @@ interface DnsDao {
         deleteBlockedDomainsBySource(sourceUrl)
         insertBlockedDomains(domains)
     }
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertLog(log: DnsRequestLogEntity)
+
+    @Query("SELECT * FROM dns_request_logs ORDER BY timestamp DESC LIMIT 100")
+    suspend fun getRecentLogs(): List<DnsRequestLogEntity>
+
+    @Query("DELETE FROM dns_request_logs WHERE timestamp < :threshold")
+    suspend fun cleanupLogs(threshold: Long)
 }

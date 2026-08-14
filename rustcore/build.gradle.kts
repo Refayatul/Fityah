@@ -47,12 +47,12 @@ android {
 tasks.register<Exec>("generateUniFFIBindings") {
     workingDir = file("rust")
     val cargoPath = "C:/Users/kai/.cargo/bin/cargo"
-    val dllFile = file("rust/target/debug/fityah_rust.dll")
+    // Use the release .so to generate bindings as it contains the latest metadata
+    val soFile = file("rust/target/aarch64-linux-android/release/libfityah_rust.so")
     
-    // Ensure the DLL exists (host build)
     commandLine = listOf(
         cargoPath, "run", "--bin", "uniffi-bindgen", "generate",
-        "--library", dllFile.absolutePath,
+        "--library", soFile.absolutePath,
         "--language", "kotlin",
         "--out-dir", "${project.buildDir}/generated/source/uniffi/main/java"
     )
