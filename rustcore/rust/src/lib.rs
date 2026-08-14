@@ -173,14 +173,12 @@ impl<'a> smoltcp::phy::TxToken for TxToken<'a> {
                 let dst_ip = ip_pkt.dst_addr();
                 match ip_pkt.next_header() {
                     IpProtocol::Tcp => {
-                        if let Ok(mut tcp_pkt) = TcpPacket::new_checked(ip_pkt.payload_mut()) {
-                            tcp_pkt.fill_checksum(&src_ip.into(), &dst_ip.into());
-                        }
+                        let mut tcp_pkt = TcpPacket::new_unchecked(ip_pkt.payload_mut());
+                        tcp_pkt.fill_checksum(&src_ip.into(), &dst_ip.into());
                     }
                     IpProtocol::Udp => {
-                        if let Ok(mut udp_pkt) = UdpPacket::new_checked(ip_pkt.payload_mut()) {
-                            udp_pkt.fill_checksum(&src_ip.into(), &dst_ip.into());
-                        }
+                        let mut udp_pkt = UdpPacket::new_unchecked(ip_pkt.payload_mut());
+                        udp_pkt.fill_checksum(&src_ip.into(), &dst_ip.into());
                     }
                     _ => {}
                 }
@@ -213,14 +211,12 @@ impl<'a> smoltcp::phy::TxToken for TxToken<'a> {
                 let dst_ip = ip_pkt.dst_addr();
                 match ip_pkt.next_header() {
                     IpProtocol::Tcp => {
-                        if let Ok(mut tcp_pkt) = TcpPacket::new_checked(ip_pkt.payload_mut()) {
-                            tcp_pkt.fill_checksum(&src_ip.into(), &dst_ip.into());
-                        }
+                        let mut tcp_pkt = TcpPacket::new_unchecked(ip_pkt.payload_mut());
+                        tcp_pkt.fill_checksum(&src_ip.into(), &dst_ip.into());
                     }
                     IpProtocol::Udp => {
-                        if let Ok(mut udp_pkt) = UdpPacket::new_checked(ip_pkt.payload_mut()) {
-                            udp_pkt.fill_checksum(&src_ip.into(), &dst_ip.into());
-                        }
+                        let mut udp_pkt = UdpPacket::new_unchecked(ip_pkt.payload_mut());
+                        udp_pkt.fill_checksum(&src_ip.into(), &dst_ip.into());
                     }
                     _ => {}
                 }
@@ -252,7 +248,7 @@ async fn run_vpn_loop(
 ) -> anyhow::Result<()> {
     use smoltcp::iface::{Config, Interface, SocketSet, SocketHandle};
     use smoltcp::time::Instant;
-    use smoltcp::wire::{IpAddress, IpCidr, Ipv4Address, Ipv6Address, Ipv4Packet, Ipv6Packet, HardwareAddress};
+    use smoltcp::wire::{IpAddress, IpCidr, Ipv4Address, Ipv6Address, Ipv4Packet, Ipv6Packet, TcpPacket, HardwareAddress};
     use smoltcp::socket::tcp;
     use smoltcp::socket::AnySocket;
     use tokio::net::{UdpSocket};
@@ -261,7 +257,7 @@ async fn run_vpn_loop(
     use std::os::unix::io::{FromRawFd};
 
     // Task: Fix fdsan crash by duplicating the FD.
-    // We MUST NOT close the original fd if Java still owns the PFD.
+    // CRITICAL: We MUST NOT close the original 'fd' because Java's ParcelFileDescriptor owns it.
     let duped_fd = unsafe { libc::dup(fd) };
     if duped_fd < 0 {
         return Err(anyhow::anyhow!("Failed to duplicate TUN fd"));
@@ -287,9 +283,10 @@ async fn run_vpn_loop(
     let mut iface = Interface::new(config, &mut device, Instant::now());
     iface.update_ip_addrs(|addrs| {
         // Phone is 10.1.10.2, Gateway is 10.1.10.1
-        addrs.push(IpCidr::new(IpAddress::v4(10, 1, 10, 1), 32)).unwrap();
+        // Using /24 so peer 10.1.10.2 is considered local.
+        addrs.push(IpCidr::new(IpAddress::v4(10, 1, 10, 1), 24)).unwrap();
         // Phone is fd00::2, Gateway is fd00::1
-        addrs.push(IpCidr::new(IpAddress::v6(0xfd00, 0, 0, 0, 0, 0, 0, 1), 128)).unwrap();
+        addrs.push(IpCidr::new(IpAddress::v6(0xfd00, 0, 0, 0, 0, 0, 0, 1), 64)).unwrap();
     });
 
     let mut sockets = SocketSet::new(vec![]);
@@ -391,6 +388,12 @@ async fn run_vpn_loop(
                                         }
                                         let mut ip_pkt = Ipv4Packet::new_unchecked(&mut packet_data);
                                         ip_pkt.set_dst_addr(Ipv4Address::new(10, 1, 10, 1));
+                                        ip_pkt.fill_checksum();
+
+                                        let s_ip = ip_pkt.src_addr();
+                                        let d_ip = ip_pkt.dst_addr();
+                                        let mut tcp_pkt = TcpPacket::new_unchecked(ip_pkt.payload_mut());
+                                        tcp_pkt.fill_checksum(&s_ip.into(), &d_ip.into());
                                     }
                                     NetSlice::Ipv6(h) => {
                                         let dst_ip = IpAddr::V6(h.header().destination().into());
@@ -403,6 +406,11 @@ async fn run_vpn_loop(
                                         }
                                         let mut ip_pkt = Ipv6Packet::new_unchecked(&mut packet_data);
                                         ip_pkt.set_dst_addr(Ipv6Address::new(0xfd00, 0, 0, 0, 0, 0, 0, 1));
+
+                                        let s_ip = ip_pkt.src_addr();
+                                        let d_ip = ip_pkt.dst_addr();
+                                        let mut tcp_pkt = TcpPacket::new_unchecked(ip_pkt.payload_mut());
+                                        tcp_pkt.fill_checksum(&s_ip.into(), &d_ip.into());
                                     }
                                 }
                                 device.rx_queue.push(packet_data);
