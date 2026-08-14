@@ -248,13 +248,10 @@ class DnsVpnService : VpnService() {
         exempt.add(packageName)
 
         // Using 10.1.10.x to avoid common home network conflicts
-        builder.addAddress("10.1.10.2", 32)
-        builder.addAddress("fd00::2", 128)
+        builder.addAddress("10.1.10.2", 24)
         builder.addRoute("0.0.0.0", 0)
-        builder.addRoute("::", 0)
 
         builder.addDnsServer("192.0.2.1")
-        builder.addDnsServer("2001:db8::1")
         
         for (pkg in exempt) {
             try {
@@ -268,7 +265,6 @@ class DnsVpnService : VpnService() {
         builder.setSession("Fityah DNS Filter")
         builder.setBlocking(true)
         builder.allowFamily(android.system.OsConstants.AF_INET)
-        builder.allowFamily(android.system.OsConstants.AF_INET6)
         builder.allowBypass()
         
         val pendingIntent = PendingIntent.getActivity(

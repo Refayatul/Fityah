@@ -68,6 +68,10 @@ class AppBlockerService : BaseBlockingService() {
 
     private val serviceScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
+    companion object {
+        private var isShizukuInitialized = false
+    }
+
     private val eventChannel = Channel<AccessibilityEvent>(Channel.CONFLATED) { droppedEvent ->
         droppedEvent.recycle()
     }
@@ -117,7 +121,10 @@ class AppBlockerService : BaseBlockingService() {
         crashLogger = CrashLogger(this)
         try {
             // Task: Store listener to prevent leak
-            rikka.shizuku.ShizukuProvider.requestBinderForNonProviderProcess(this)
+            if (!isShizukuInitialized) {
+                rikka.shizuku.ShizukuProvider.requestBinderForNonProviderProcess(this)
+                isShizukuInitialized = true
+            }
         } catch (e: Exception) {
             Log.e("Shizuku", "Failed to bind Shizuku in non-provider process", e)
         }
