@@ -1,12 +1,7 @@
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use log::{info, error, debug};
-use std::collections::HashMap;
-use std::net::{SocketAddr, IpAddr};
-
-#[cfg(unix)]
 use std::os::unix::io::FromRawFd;
-#[cfg(unix)]
 use std::io::{Read, Write};
 
 uniffi::setup_scaffolding!();
@@ -22,7 +17,7 @@ pub fn rust_init_logger() {
 
 #[uniffi::export]
 pub fn ping_rust() -> String {
-    "Pong from Rust via UniFFI!".to_string()
+    "Pong from Rust via UniFFI Proc-Macros!".to_string()
 }
 
 #[uniffi::export(callback_interface)]
@@ -66,21 +61,13 @@ impl VpnController {
                 }
             });
         });
-
-        #[cfg(windows)]
-        {
-            error!("VPN core start ignored on Windows host.");
-            let _ = (fd, callback, protector, stop_signal);
-        }
     }
 
     pub fn stop(&self) {
         let stop_signal = self.stop_signal.clone();
-        // Since we are in a sync context but need to update an async mutex
         let rt = tokio::runtime::Builder::new_current_thread().build().unwrap();
         rt.block_on(async {
-            let mut stop = stop_signal.lock().await;
-            *stop = true;
+            *stop_signal.lock().await = true;
         });
     }
 }
@@ -93,16 +80,12 @@ async fn run_vpn_loop(
     stop_signal: Arc<Mutex<bool>>
 ) -> anyhow::Result<()> {
     use std::io::ErrorKind;
-    use std::os::unix::io::AsRawFd;
+    use etherparse::SlicedPacket;
 
     let mut file = unsafe { std::fs::File::from_raw_fd(fd) };
     let mut buffer = [0u8; 65535];
 
-    // Task 4: Simplified UDP NAT state (Source Port -> Real Socket)
-    // For a robust implementation, we'd use smoltcp sockets.
-    let mut udp_relays: HashMap<u16, Arc<tokio::net::UdpSocket>> = HashMap::new();
-
-    info!("Fityah VPN: Catch-all loop active (0.0.0.0/0).");
+    info!("Fityah VPN: Catch-all loop active.");
     loop {
         if *stop_signal.lock().await {
             break;
@@ -120,45 +103,37 @@ async fn run_vpn_loop(
 
         let packet_data = &buffer[..n];
 
-        match etherparse::SlicedPacket::from_ip(packet_data) {
-            Ok(sliced) => {
-                if let Some(transport) = sliced.transport {
-                    match transport {
-                        etherparse::TransportSlice::Udp(udp) => {
-                            let dst_port = udp.destination_port();
-
-                            // FILTER-PATH: Intercept DNS/DoT/DoH
-                            if dst_port == 53 || dst_port == 853 || dst_port == 443 {
-                                if let Some(response) = callback.on_dns_packet(packet_data.to_vec()) {
-                                    if !response.is_empty() {
-                                        let _ = file.write(&response);
-                                        continue;
-                                    }
-                                }
-                            }
-
-                            // FAST-PATH: Minimal UDP Forwarding (NAT Placeholder)
-                            // To keep connectivity working, we need to relay this to the real world.
-                            // Integration of smoltcp will happen here next.
-                        }
-                        etherparse::TransportSlice::Tcp(tcp) => {
-                            let dst_port = tcp.destination_port();
-                            if dst_port == 853 || dst_port == 443 {
-                                if let Some(response) = callback.on_dns_packet(packet_data.to_vec()) {
-                                    if response.is_empty() { continue; } // Blocked IP
-                                }
-                            }
-                        }
-                        _ => {}
-                    }
+        // --- Hybrid Interceptor ---
+        if is_intercept_candidate(packet_data) {
+            if let Some(response) = callback.on_dns_packet(packet_data.to_vec()) {
+                if !response.is_empty() {
+                    let _ = file.write(&response);
+                    continue;
+                } else {
+                    continue; // Dropped by filter
                 }
             }
-            Err(_) => {}
         }
 
-        // Pass-through isn't simple in a VPN. If we don't NAT, we drop.
-        // I am implementing smoltcp in the next turn to enable full connectivity.
+        // --- Fast-Path Forwarder ---
+        // For this proof-of-concept, we must handle at least UDP forwarding
+        // to restore basic connectivity.
+        // TCP will be added via smoltcp Interface in the next session.
     }
     info!("Fityah VPN: Loop exited.");
     Ok(())
+}
+
+fn is_intercept_candidate(data: &[u8]) -> bool {
+    if data.len() < 28 { return false; }
+    if data[0] >> 4 == 4 {
+        let protocol = data[9];
+        if protocol == 17 { // UDP
+            let ihl = (data[0] & 0x0F) as usize * 4;
+            if data.len() < ihl + 4 { return false; }
+            let dst_port = u16::from_be_bytes([data[ihl + 2], data[ihl + 3]]);
+            return dst_port == 53 || dst_port == 853 || dst_port == 443;
+        }
+    }
+    false
 }

@@ -50,6 +50,12 @@ class DnsVpnService : VpnService() {
         }
     }
 
+    private val socketProtector = object : uniffi.fityah_rust.SocketProtector {
+        override fun protectSocket(fd: Int): Boolean {
+            return this@DnsVpnService.protect(fd)
+        }
+    }
+
     private val connectivityManager by lazy { getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager }
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
@@ -143,7 +149,7 @@ class DnsVpnService : VpnService() {
                 uniffi.fityah_rust.rustInitLogger()
                 
                 vpnController = uniffi.fityah_rust.VpnController()
-                vpnController?.start(fd, dnsCallback)
+                vpnController?.start(fd, dnsCallback, socketProtector)
                 
                 withContext(Dispatchers.Main) {
                     Toast.makeText(applicationContext, "Fityah DNS Filter Active", Toast.LENGTH_SHORT).show()
