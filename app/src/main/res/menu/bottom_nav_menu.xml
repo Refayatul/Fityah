@@ -5,10 +5,6 @@
         android:icon="@drawable/ic_usage"
         android:title="@string/usage" />
     <item
-        android:id="@+id/nav_focus"
-        android:icon="@drawable/ic_focus"
-        android:title="@string/focus" />
-    <item
         android:id="@+id/nav_reducers"
         android:icon="@drawable/ic_reducers"
         android:title="@string/reducers" />
