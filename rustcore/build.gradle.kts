@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
 }
 
 android {
@@ -22,15 +21,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
-    
-    kotlinOptions {
-        jvmTarget = "21"
-    }
 
-    sourceSets {
+sourceSets {
         getByName("main") {
             // Include generated UniFFI bindings
-            java.srcDir("${project.buildDir}/generated/source/uniffi/main/java")
+            java.directories.add(layout.buildDirectory.dir("generated/source/uniffi/main/java").get().asFile.absolutePath)
             // Native libraries are in src/main/jniLibs
         }
     }
@@ -54,7 +49,7 @@ tasks.register<Exec>("generateUniFFIBindings") {
         cargoPath, "run", "--bin", "uniffi-bindgen", "generate",
         "--library", soFile.absolutePath,
         "--language", "kotlin",
-        "--out-dir", "${project.buildDir}/generated/source/uniffi/main/java"
+        "--out-dir", layout.buildDirectory.dir("generated/source/uniffi/main/java").get().asFile.absolutePath
     )
 }
 
@@ -66,5 +61,5 @@ project.tasks.configureEach {
 
 dependencies {
     implementation(libs.androidx.core.ktx)
-    api("net.java.dev.jna:jna:${libs.versions.jna.get()}@aar")
+    api(libs.jna)
 }
