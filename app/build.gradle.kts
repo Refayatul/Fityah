@@ -1,8 +1,8 @@
 import java.util.Locale
+import com.android.build.api.variant.ApplicationVariant
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
 }
 
@@ -58,7 +58,7 @@ android {
         versionCode = 4
         versionName = "4"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        resValue("string", "app_name", "Fityah")
+        // resValue("string", "app_name", "Fityah") - disabled for AGP 9.x migration
 
         ndk {
             // Restricted to arm64-v8a for rapid testing on physical device.
@@ -110,8 +110,8 @@ android {
     sourceSets {
         // Cross device sync code shared by the full and playstore flavors.
         // F-Droid never compiles it, so that build stays offline.
-        getByName("full") { java.srcDir("src/sync/java") }
-        getByName("playstore") { java.srcDir("src/sync/java") }
+        getByName("full") { java.srcDirs("src/sync/java") }
+        getByName("playstore") { java.srcDirs("src/sync/java") }
     }
 
     splits {
@@ -127,25 +127,11 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-
-            // required because of hardcoded f-droid values
-            applicationVariants.all {
-                val variant = this
-                if (variant.flavorName == "fdroid") {
-                    variant.outputs
-                        .map { it as com.android.build.gradle.internal.api.BaseVariantOutputImpl }
-                        .forEach { output ->
-                            val outputFileName = "app-fdroid-universal-release-unsigned.apk"
-                            println("OutputFileName: $outputFileName")
-                            output.outputFileName = outputFileName
-                        }
-                }
-            }
         }
         debug {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
-            resValue("string", "app_name", "Debug Fityah")
+            // resValue("string", "app_name", "Debug Fityah") - disabled for AGP 9.x migration
         }
     }
 
@@ -154,16 +140,23 @@ android {
         targetCompatibility = JavaVersion.VERSION_21
     }
 
-    kotlinOptions {
-        jvmTarget = "21"
-    }
-
     buildFeatures {
         viewBinding = true
         buildConfig = true
         aidl = true
     }
 }
+
+// Configure F-Droid variant output file name - disabled for AGP 9.x migration
+// androidComponents {
+//     onVariants { variant ->
+//         if (variant.flavorName == "fdroid") {
+//             variant.outputs.all {
+//                 it.outputFileName = "app-fdroid-universal-release-unsigned.apk"
+//             }
+//         }
+//     }
+// }
 
 dependencies {
     implementation(project(":rustcore"))
@@ -226,32 +219,32 @@ dependencies {
     implementation(libs.timerangepicker)
 }
 
-androidComponents {
-    onVariants { variant ->
-        val variantName = variant.name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
-        tasks.register("installAndGrantAccessibility$variantName") {
-            group = "install"
-            description = "Installs the app, grants Accessibility permission, and launches it"
-            dependsOn("install$variantName")
-            
-            doLast {
-                val adbPath = sdkComponents.adb.get().asFile.absolutePath
-                val appId = variant.applicationId.get()
-                Thread.sleep(2000)
-                // Grant Accessibility Permission
-                exec {
-                    val baseId = "com.refayatul.fityah"
-                    val services = "$appId/$baseId.services.AppBlockerService"
-
-                    commandLine(adbPath, "shell", "settings", "put", "secure", "enabled_accessibility_services", services)
-                }
-
-                // Launch MainActivity
-                exec {
-                    val baseId = "com.refayatul.fityah"
-                    commandLine(adbPath, "shell", "am", "start", "-n", "$appId/$baseId.ui.activity.FragmentActivity")
-                }
-            }
-        }
-    }
-}
+// androidComponents {
+//     onVariants { variant ->
+//         val variantName = variant.name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+//         tasks.register("installAndGrantAccessibility$variantName") {
+//             group = "install"
+//             description = "Installs the app, grants Accessibility permission, and launches it"
+//             dependsOn("install$variantName")
+//             
+//             doLast {
+//                 val adbPath = sdkComponents.adb.get().asFile.absolutePath
+//                 val appId = variant.applicationId.get()
+//                 Thread.sleep(2000)
+//                 // Grant Accessibility Permission
+//                 exec {
+//                     val baseId = "com.refayatul.fityah"
+//                     val services = "$appId/$baseId.services.AppBlockerService"
+// 
+//                     commandLine(adbPath, "shell", "settings", "put", "secure", "enabled_accessibility_services", services)
+//                 }
+// 
+//                 // Launch MainActivity
+//                 exec {
+//                     val baseId = "com.refayatul.fityah"
+//                     commandLine(adbPath, "shell", "am", "start", "-n", "$appId/$baseId.ui.activity.FragmentActivity")
+//                 }
+//             }
+//         }
+//     }
+// }
