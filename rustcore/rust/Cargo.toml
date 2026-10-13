@@ -20,5 +20,7 @@ android_logger = "0.13"
 thiserror = "1.0"
 etherparse = "0.14"
 libc = "0.2"
+rustls = "0.23"
+webpki-roots = "0.26"
 
 
