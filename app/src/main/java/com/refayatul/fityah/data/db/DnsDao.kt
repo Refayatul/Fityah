@@ -67,6 +67,18 @@ interface DnsDao {
 
     @Query("SELECT * FROM dns_request_logs WHERE packageName = :pkg ORDER BY timestamp DESC LIMIT 200")
     suspend fun getLogsForApp(pkg: String): List<DnsRequestLogEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAppRule(rule: VpnAppRuleEntity)
+
+    @Query("DELETE FROM vpn_app_rules WHERE packageName = :pkg AND domain = :domain")
+    suspend fun deleteAppRule(pkg: String, domain: String)
+
+    @Query("SELECT isAllowed FROM vpn_app_rules WHERE packageName = :pkg AND domain = :domain LIMIT 1")
+    suspend fun getAppRule(pkg: String, domain: String): Boolean?
+
+    @Query("SELECT * FROM vpn_app_rules WHERE packageName = :pkg")
+    suspend fun getRulesForApp(pkg: String): List<VpnAppRuleEntity>
 }
 
 data class VpnAppStats(

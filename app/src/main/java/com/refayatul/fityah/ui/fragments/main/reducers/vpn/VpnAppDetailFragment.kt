@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.refayatul.fityah.R
 import com.refayatul.fityah.data.db.AppDatabase
 import com.refayatul.fityah.data.db.DnsRequestLogEntity
+import com.refayatul.fityah.data.db.VpnAppRuleEntity
 import com.refayatul.fityah.databinding.FragmentDnsListBinding
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -44,58 +45,80 @@ class VpnAppDetailFragment : Fragment() {
         binding.btnAdd.visibility = View.GONE
         
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        refreshLogs()
+        refreshData()
 
         binding.btnBack.setOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
     }
 
-    private fun refreshLogs() {
+    private fun refreshData() {
         val pkg = packageName ?: return
         viewLifecycleOwner.lifecycleScope.launch {
             val db = AppDatabase.getInstance(requireContext())
             val logs = db.dnsDao().getLogsForApp(pkg)
-            binding.recyclerView.adapter = LogsAdapter(logs)
+            val rules = db.dnsDao().getRulesForApp(pkg)
+            
+            // Group by domain to show a unique list with toggles
+            val domainMap = logs.groupBy { it.domain }.map { (domain, domainLogs) ->
+                val trackerName = domainLogs.firstNotNullOfOrNull { it.trackerName }
+                val currentRule = rules.find { it.domain == domain }?.isAllowed
+                // Default to Allowed if no rule exists, unless it was blocked in logs? 
+                // TC usually shows "Allow" by default for essential apps and "Block" for trackers.
+                val isAllowed = currentRule ?: !domainLogs.any { it.isBlocked }
+                
+                AppDomainItem(domain, trackerName, isAllowed)
+            }.sortedByDescending { it.trackerName != null }
+
+            binding.recyclerView.adapter = RulesAdapter(domainMap)
         }
     }
 
-    private inner class LogsAdapter(private val logs: List<DnsRequestLogEntity>) :
-        RecyclerView.Adapter<LogsAdapter.ViewHolder>() {
+    data class AppDomainItem(
+        val domain: String,
+        val trackerName: String?,
+        val isAllowed: Boolean
+    )
 
-        private val dateFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+    private inner class RulesAdapter(private val list: List<AppDomainItem>) :
+        RecyclerView.Adapter<RulesAdapter.ViewHolder>() {
 
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            val textDomain: TextView = view.findViewById(android.R.id.text1)
-            val textInfo: TextView = view.findViewById(android.R.id.text2)
+            val textDomain: TextView = view.findViewById(R.id.text_domain)
+            val textTracker: TextView = view.findViewById(R.id.text_tracker)
+            val switchRule: com.google.android.material.materialswitch.MaterialSwitch = view.findViewById(R.id.switch_rule)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context)
-                .inflate(android.R.layout.simple_list_item_2, parent, false)
+                .inflate(R.layout.item_vpn_app_rule, parent, false)
             return ViewHolder(view)
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val log = logs[position]
-            val time = dateFormat.format(Date(log.timestamp))
+            val item = list[position]
+            holder.textDomain.text = item.domain
+            holder.textTracker.text = item.trackerName ?: "Direct Connection"
             
-            if (log.trackerName != null) {
-                holder.textDomain.text = "⚠️ ${log.trackerName}"
-                holder.textInfo.text = "${log.domain} • $time"
-            } else {
-                holder.textDomain.text = log.domain
-                holder.textInfo.text = time
-            }
-            
-            if (log.isBlocked) {
+            if (item.trackerName != null) {
                 holder.textDomain.setTextColor(requireContext().getColor(android.R.color.holo_red_dark))
             } else {
                 holder.textDomain.setTextColor(requireContext().getColor(android.R.color.holo_blue_dark))
             }
+
+            holder.switchRule.setOnCheckedChangeListener(null)
+            holder.switchRule.isChecked = item.isAllowed
+            
+            holder.switchRule.setOnCheckedChangeListener { _, isChecked ->
+                val pkg = packageName ?: return@setOnCheckedChangeListener
+                viewLifecycleOwner.lifecycleScope.launch {
+                    val db = AppDatabase.getInstance(requireContext())
+                    db.dnsDao().insertAppRule(VpnAppRuleEntity(pkg, item.domain, isChecked))
+                }
+            }
         }
 
-        override fun getItemCount() = logs.size
+        override fun getItemCount() = list.size
     }
 
     override fun onDestroyView() {

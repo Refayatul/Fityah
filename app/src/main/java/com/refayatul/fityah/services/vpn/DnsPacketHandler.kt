@@ -118,6 +118,22 @@ class DnsPacketHandler(private val context: Context, private val proxy: UdpDnsPr
             Log.i("DnsPacketHandler", "MATCHED TRACKER: $trackerName for domain $domain")
         }
 
+        // Per-App Rule Check
+        if (attributedPackageName != null) {
+            val appRule = dnsDao.getAppRule(attributedPackageName, domain)
+            if (appRule != null) {
+                if (appRule) { // Explicitly Allowed
+                    Log.d("DnsPacketHandler", "Per-app Allow: $domain for $attributedPackageName")
+                    dnsDao.insertLog(DnsRequestLogEntity(domain = domain, appName = attributedAppName, packageName = attributedPackageName, isBlocked = false, trackerName = trackerName))
+                    return resolveAndProxy(domain, buffer, limit, ipLen, udpStart, version)
+                } else { // Explicitly Blocked
+                    Log.d("DnsPacketHandler", "Per-app Block: $domain for $attributedPackageName")
+                    dnsDao.insertLog(DnsRequestLogEntity(domain = domain, appName = attributedAppName, packageName = attributedPackageName, isBlocked = true, trackerName = trackerName))
+                    return createNxDomainResponse(buffer, limit, ipLen, udpStart, version)
+                }
+            }
+        }
+
         if (version == 4 && config.forcedSafeSearch) {
             val safeIp = getSafeSearchIp(domain)
             if (safeIp != null) {
@@ -133,6 +149,15 @@ class DnsPacketHandler(private val context: Context, private val proxy: UdpDnsPr
             return createNxDomainResponse(buffer, limit, ipLen, udpStart, version)
         }
         
+        val response = resolveAndProxy(domain, buffer, limit, ipLen, udpStart, version)
+        if (response != null) {
+            Log.d("DnsPacketHandler", "Logging Allowed: $domain")
+            dnsDao.insertLog(DnsRequestLogEntity(domain = domain, appName = attributedAppName, packageName = attributedPackageName, isBlocked = false, trackerName = trackerName))
+        }
+        return response
+    }
+
+    private suspend fun resolveAndProxy(domain: String, buffer: ByteArray, limit: Int, ipLen: Int, udpStart: Int, version: Int): ByteBuffer? {
         val dnsDataStart = udpStart + 8
         val query = buffer.copyOfRange(dnsDataStart, limit)
         
@@ -143,8 +168,6 @@ class DnsPacketHandler(private val context: Context, private val proxy: UdpDnsPr
             return null
         }
         
-        Log.d("DnsPacketHandler", "Logging Allowed: $domain")
-        dnsDao.insertLog(DnsRequestLogEntity(domain = domain, appName = attributedAppName, packageName = attributedPackageName, isBlocked = false, trackerName = trackerName))
         return createResponsePacket(buffer, ipLen, udpStart, dnsResponse, version)
     }
 

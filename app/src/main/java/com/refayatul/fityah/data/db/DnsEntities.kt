@@ -34,3 +34,10 @@ data class DnsRequestLogEntity(
     val isBlocked: Boolean,
     val trackerName: String? = null
 )
+
+@Entity(tableName = "vpn_app_rules", primaryKeys = ["packageName", "domain"])
+data class VpnAppRuleEntity(
+    val packageName: String,
+    val domain: String,
+    val isAllowed: Boolean
+)
