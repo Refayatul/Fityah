@@ -8,12 +8,11 @@ import androidx.core.view.WindowInsetsCompat
 import com.refayatul.fityah.R
 import com.refayatul.fityah.ui.fragments.installation.AccessibilityGuide
 import com.refayatul.fityah.ui.fragments.installation.onboarding.OnboardingFragment
-import com.refayatul.fityah.ui.fragments.main.focus.FocusFragment
 import com.refayatul.fityah.ui.fragments.main.reducers.ReducersFragment
 import com.refayatul.fityah.ui.fragments.main.reducers.analytics.IntentsLogFragment
 import com.refayatul.fityah.ui.fragments.main.reducers.anti_stimulants.grayscale.CreateGrayscaleGroupFragment
 import com.refayatul.fityah.ui.fragments.main.reducers.anti_stimulants.grayscale.GrayscaleFragment
-import com.refayatul.fityah.ui.fragments.main.usage.AllAppsUsageFragment
+import com.refayatul.fityah.ui.fragments.main.reducers.anti_stimulants.reel_counter.ReelCounterFragment
 import com.refayatul.fityah.ui.fragments.main.reducers.blockertools.appBlocker.AppBlockerGroupsFragment
 import com.refayatul.fityah.ui.fragments.main.reducers.blockertools.appBlocker.CreateAppGroupFragment
 import com.refayatul.fityah.ui.fragments.main.reducers.blockertools.autodnd.AutoDndFragment
@@ -53,7 +52,7 @@ class FragmentActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val sharedPreferences = getSharedPreferences("AppPreferences", android.content.Context.MODE_PRIVATE)
         val isFirstLaunchComplete = sharedPreferences.getBoolean("isFirstLaunchComplete", false)
-        val selectedFragment = intent.getStringExtra("fragment") ?: if (!isFirstLaunchComplete) OnboardingFragment.FRAGMENT_ID else AllAppsUsageFragment.FRAGMENT_ID
+        val selectedFragment = intent.getStringExtra("fragment") ?: if (!isFirstLaunchComplete) OnboardingFragment.FRAGMENT_ID else ReelCounterFragment.FRAGMENT_ID
 
         if (selectedFragment == OnboardingFragment.FRAGMENT_ID) {
             setTheme(R.style.Theme_Fityah_Onboarding)
@@ -266,17 +265,15 @@ class FragmentActivity : AppCompatActivity() {
     // used to force a full reload (and its loading flash) on every tab revisit.
     private val tabTags = mapOf(
         R.id.nav_usage to "tab_usage",
-        R.id.nav_focus to "tab_focus",
         R.id.nav_reducers to "tab_reducers",
         R.id.nav_info to "tab_info",
     )
 
     private fun createTabFragment(itemId: Int): Fragment = when (itemId) {
-        R.id.nav_usage -> AllAppsUsageFragment()
-        R.id.nav_focus -> FocusFragment()
+        R.id.nav_usage -> ReelCounterFragment()
         R.id.nav_reducers -> ReducersFragment()
         R.id.nav_info -> com.refayatul.fityah.ui.fragments.main.InfoFragment()
-        else -> AllAppsUsageFragment()
+        else -> ReelCounterFragment()
     }
 
     private fun showTab(itemId: Int, commitNow: Boolean = false) {

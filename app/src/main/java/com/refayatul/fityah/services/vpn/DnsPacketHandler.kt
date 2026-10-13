@@ -4,6 +4,8 @@ import android.content.Context
 import android.util.Log
 import com.refayatul.fityah.data.db.DnsDao
 import com.refayatul.fityah.data.db.DnsRequestLogEntity
+import com.refayatul.fityah.data.models.DnsType
+import com.refayatul.fityah.data.models.DnsServer
 import com.refayatul.fityah.data.models.VpnConfig
 import com.refayatul.fityah.utils.BlocklistManager
 import kotlinx.coroutines.Dispatchers
@@ -12,7 +14,12 @@ import java.nio.ByteBuffer
 
 import java.util.Locale
 
-class DnsPacketHandler(private val context: Context, private val proxy: UdpDnsProxy, private val config: VpnConfig) {
+class DnsPacketHandler(
+    private val context: Context,
+    private val vpnController: uniffi.fityah_rust.VpnController,
+    private val socketProtector: uniffi.fityah_rust.SocketProtector,
+    private val config: VpnConfig
+) {
     private val blocklistManager = BlocklistManager(context)
     private val db = com.refayatul.fityah.data.db.AppDatabase.getInstance(context)
     private val dnsDao = db.dnsDao()
@@ -161,7 +168,15 @@ class DnsPacketHandler(private val context: Context, private val proxy: UdpDnsPr
         val dnsDataStart = udpStart + 8
         val query = buffer.copyOfRange(dnsDataStart, limit)
         
-        val dnsResponse = proxy.resolve(query, config.dnsServers)
+        val rustServers = config.dnsServers.map { server ->
+            val serverType = when (server.type) {
+                DnsType.PLAIN -> uniffi.fityah_rust.DnsServerType.PLAIN
+                DnsType.DOH, DnsType.DOH3 -> uniffi.fityah_rust.DnsServerType.DO_H
+                DnsType.DOT -> uniffi.fityah_rust.DnsServerType.DO_T
+            }
+            uniffi.fityah_rust.DnsServer(server.address, serverType, server.isEnabled)
+        }
+        val dnsResponse = vpnController.resolveDns(query, rustServers, socketProtector)
         
         if (dnsResponse == null) {
             Log.w("DnsPacketHandler", "No response for $domain")

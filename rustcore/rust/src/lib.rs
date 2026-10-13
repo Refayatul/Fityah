@@ -1,6 +1,9 @@
 use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, Ordering};
-use log::info;
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+use std::sync::Mutex as StdMutex;
+use std::collections::HashMap;
+use std::time::{Duration, Instant};
+use log::{info, debug, warn};
 
 #[cfg(unix)]
 use std::os::unix::io::{FromRawFd, AsRawFd, OwnedFd};
@@ -31,9 +34,451 @@ pub trait SocketProtector: Send + Sync {
     fn protect_socket(&self, fd: i32) -> bool;
 }
 
+#[derive(uniffi::Enum)]
+pub enum DnsServerType {
+    Plain,
+    DoH,
+    DoH3,
+    DoT,
+}
+
+#[derive(uniffi::Record)]
+pub struct DnsServer {
+    pub address: String,
+    pub server_type: DnsServerType,
+    pub is_enabled: bool,
+}
+
+fn create_server_name(host: &str) -> Option<rustls::pki_types::ServerName<'static>> {
+    if let Ok(ip) = host.parse::<std::net::IpAddr>() {
+        return Some(rustls::pki_types::ServerName::IpAddress(ip.into()));
+    }
+    let host_static: &'static str =
+        Box::leak(host.to_string().into_boxed_str());
+    rustls::pki_types::ServerName::try_from(host_static).ok()
+}
+
+fn find_header_end(data: &[u8]) -> Option<usize> {
+    for i in 0..data.len().saturating_sub(3) {
+        if data[i] == 0x0D
+            && data[i + 1] == 0x0A
+            && data[i + 2] == 0x0D
+            && data[i + 3] == 0x0A
+        {
+            return Some(i + 4);
+        }
+    }
+    None
+}
+
+fn parse_http_body(data: &[u8]) -> Option<Vec<u8>> {
+    let header_end = find_header_end(data)?;
+    let body = &data[header_end..];
+    if body.is_empty() {
+        return None;
+    }
+    Some(body.to_vec())
+}
+
+static REEL_DOMAINS: &[&str] = &[
+    "tiktok.com",
+    "tiktokv.com",
+    "instagram.com",
+    "fbcdn.net",
+    "youtube.com",
+    "youtu.be",
+    "googlevideo.com",
+    "snapchat.com",
+    "facebook.com",
+    "fbscdn.com",
+];
+
+fn parse_dns_query_name(query: &[u8]) -> Option<String> {
+    if query.len() < 12 {
+        return None;
+    }
+    let qdcount = u16::from_be_bytes([query[4], query[5]]);
+    if qdcount == 0 {
+        return None;
+    }
+    let mut pos = 12usize;
+    let mut labels = Vec::new();
+    while pos < query.len() {
+        let len = query[pos] as usize;
+        if len == 0 {
+            break;
+        }
+        if pos + len >= query.len() {
+            return None;
+        }
+        labels.push(std::str::from_utf8(&query[pos + 1..pos + 1 + len]).ok()?);
+        pos += 1 + len;
+    }
+    if labels.is_empty() {
+        return None;
+    }
+    Some(labels.join("."))
+}
+
+fn is_reel_domain(domain: &str) -> bool {
+    let lower = domain.to_lowercase();
+    REEL_DOMAINS.iter().any(|d| lower.ends_with(d) || lower == *d)
+}
+
+fn base64url_encode(data: &[u8]) -> String {
+    const URL_SAFE: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+    let mut result = String::with_capacity((data.len() + 2) / 3 * 4);
+    for chunk in data.chunks(3) {
+        let b0 = chunk[0] as u32;
+        let b1 = if chunk.len() > 1 { chunk[1] as u32 } else { 0 };
+        let b2 = if chunk.len() > 2 { chunk[2] as u32 } else { 0 };
+        let triple = (b0 << 16) | (b1 << 8) | b2;
+        result.push(URL_SAFE[((triple >> 18) & 0x3F) as usize] as char);
+        result.push(URL_SAFE[((triple >> 12) & 0x3F) as usize] as char);
+        if chunk.len() > 1 {
+            result.push(URL_SAFE[((triple >> 6) & 0x3F) as usize] as char);
+        }
+        if chunk.len() > 2 {
+            result.push(URL_SAFE[(triple & 0x3F) as usize] as char);
+        }
+    }
+    result
+}
+
+struct DnsResolver {
+    tls_config: Arc<rustls::ClientConfig>,
+    cache: StdMutex<HashMap<Vec<u8>, (Vec<u8>, Instant)>>,
+}
+
+impl DnsResolver {
+    fn new() -> Self {
+        let mut root_store = rustls::RootCertStore::empty();
+        root_store.extend(webpki_roots::TLS_SERVER_ROOTS.iter().cloned());
+        let tls_config = Arc::new(
+            rustls::ClientConfig::builder()
+                .with_root_certificates(root_store)
+                .with_no_client_auth()
+        );
+
+        DnsResolver {
+            tls_config,
+            cache: StdMutex::new(HashMap::new()),
+        }
+    }
+
+    fn check_cache(&self, query: &[u8]) -> Option<Vec<u8>> {
+        let cache = self.cache.lock().ok()?;
+        let (response, expires_at) = cache.get(query)?;
+        if *expires_at > Instant::now() {
+            Some(response.clone())
+        } else {
+            None
+        }
+    }
+
+    fn update_cache(&self, query: Vec<u8>, response: Vec<u8>) {
+        let ttl = Duration::from_secs(300);
+        let expires_at = Instant::now() + ttl;
+        if let Ok(mut cache) = self.cache.lock() {
+            cache.insert(query, (response, expires_at));
+            if cache.len() > 500 {
+                let oldest_key = cache
+                    .iter()
+                    .min_by_key(|(_, (_, expiry))| *expiry)
+                    .map(|(k, _)| k.clone());
+                if let Some(key) = oldest_key {
+                    cache.remove(&key);
+                }
+            }
+        }
+    }
+}
+
+fn is_valid_dns_response(query: &[u8], response: &[u8]) -> bool {
+    if query.len() < 2 || response.len() < 2 {
+        return false;
+    }
+    let query_id = (query[0] as u16) << 8 | query[1] as u16;
+    let response_id = (response[0] as u16) << 8 | response[1] as u16;
+    if query_id != response_id {
+        warn!(
+            "DNS response ID mismatch: expected {:04x}, got {:04x}",
+            query_id, response_id
+        );
+        return false;
+    }
+    let qr = (response[2] as u16 & 0x80) != 0;
+    if !qr {
+        warn!("DNS response missing QR bit (expected response, got query)");
+        return false;
+    }
+    true
+}
+
+fn is_dns_truncated(response: &[u8]) -> bool {
+    if response.len() < 3 {
+        return false;
+    }
+    (response[2] as u8 & 0x02) != 0
+}
+
+impl DnsResolver {
+    fn resolve(
+        &self,
+        query: &[u8],
+        servers: &[DnsServer],
+        protector: &dyn SocketProtector,
+    ) -> Option<Vec<u8>> {
+        if let Some(cached) = self.check_cache(query) {
+            debug!("DNS cache hit for query ({} bytes)", query.len());
+            return Some(cached);
+        }
+
+        debug!("DNS cache miss, resolving with {} servers", servers.len());
+
+        for server in servers {
+            if !server.is_enabled {
+                continue;
+            }
+
+            let result = match server.server_type {
+                DnsServerType::Plain => {
+                    self.resolve_plain(query, &server.address, protector)
+                }
+                DnsServerType::DoH | DnsServerType::DoH3 => {
+                    self.resolve_doh(query, &server.address, protector)
+                }
+                DnsServerType::DoT => {
+                    self.resolve_dot(query, &server.address, protector)
+                }
+            };
+
+            if let Some(resp) = result {
+                if !is_valid_dns_response(query, &resp) {
+                    warn!("Invalid DNS response from server, discarding");
+                    continue;
+                }
+                if is_dns_truncated(&resp) {
+                    warn!("DNS response truncated (TC flag set), consider TCP");
+                }
+                self.update_cache(query.to_vec(), resp.clone());
+                return Some(resp);
+            }
+        }
+
+        warn!("All DNS servers exhausted for query ({} bytes)", query.len());
+        None
+    }
+
+    fn resolve_plain(
+        &self,
+        query: &[u8],
+        address: &str,
+        protector: &dyn SocketProtector,
+    ) -> Option<Vec<u8>> {
+        use std::net::UdpSocket;
+
+        info!("DNS (Plain) -> {}", address);
+        let server_addr: std::net::SocketAddr = format!("{}:53", address).parse().ok()?;
+
+        let socket = UdpSocket::bind("0.0.0.0:0").ok()?;
+        #[cfg(unix)]
+        {
+            let _ = protector.protect_socket(socket.as_raw_fd());
+        }
+        socket.set_read_timeout(Some(Duration::from_secs(5))).ok()?;
+        socket.connect(server_addr).ok()?;
+
+        socket.send(query).ok()?;
+        let mut buf = vec![0u8; 4096];
+        let n = socket.recv(&mut buf).ok()?;
+        buf.truncate(n);
+        Some(buf)
+    }
+
+    fn resolve_doh(
+        &self,
+        query: &[u8],
+        url: &str,
+        protector: &dyn SocketProtector,
+    ) -> Option<Vec<u8>> {
+        use std::io::{Read, Write};
+        use std::net::ToSocketAddrs;
+        use rustls::ClientConnection;
+        use rustls::StreamOwned;
+
+        info!("DNS (DoH) -> {}", url);
+
+        let rest = url.strip_prefix("https://")?;
+        let (host_and_port, path) = rest.split_once('/').unwrap_or((rest, ""));
+        let (host, port_str) = host_and_port
+            .split_once(':')
+            .unwrap_or((host_and_port, "443"));
+        let port: u16 = port_str.parse().unwrap_or(443);
+        let addr = (host, port).to_socket_addrs().ok()?.next()?;
+
+        // Try POST first (RFC 8484)
+        if let Some(resp) = self.doh_post(query, url, path, host, addr, protector) {
+            if is_valid_dns_response(query, &resp) {
+                return Some(resp);
+            }
+        }
+
+        // Fallback to GET
+        self.doh_get(query, url, path, host, addr, protector)
+    }
+
+    fn doh_post(
+        &self,
+        query: &[u8],
+        _url: &str,
+        path: &str,
+        host: &str,
+        addr: std::net::SocketAddr,
+        protector: &dyn SocketProtector,
+    ) -> Option<Vec<u8>> {
+        use std::io::Read;
+        use std::io::Write;
+        use rustls::ClientConnection;
+        use rustls::StreamOwned;
+
+        let tcp = std::net::TcpStream::connect_timeout(&addr, Duration::from_secs(5)).ok()?;
+        #[cfg(unix)]
+        {
+            let _ = protector.protect_socket(tcp.as_raw_fd());
+        }
+        tcp.set_read_timeout(Some(Duration::from_secs(5))).ok()?;
+        tcp.set_write_timeout(Some(Duration::from_secs(5))).ok()?;
+
+        let server_name = create_server_name(host)?;
+        let conn = ClientConnection::new(self.tls_config.clone(), server_name).ok()?;
+        let mut tls = StreamOwned::new(conn, tcp);
+
+        let http_request = format!(
+            "POST /{} HTTP/1.1\r\n\
+             Host: {}\r\n\
+             Content-Type: application/dns-message\r\n\
+             Accept: application/dns-message\r\n\
+             Content-Length: {}\r\n\
+             Connection: close\r\n\
+             User-Agent: Fityah/1.0\r\n\
+             \r\n",
+            path,
+            host,
+            query.len()
+        );
+
+        tls.write_all(http_request.as_bytes()).ok()?;
+        tls.write_all(query).ok()?;
+        tls.flush().ok()?;
+
+        let mut buf = Vec::new();
+        tls.read_to_end(&mut buf).ok()?;
+
+        parse_http_body(&buf)
+    }
+
+    fn doh_get(
+        &self,
+        query: &[u8],
+        url: &str,
+        path: &str,
+        host: &str,
+        addr: std::net::SocketAddr,
+        protector: &dyn SocketProtector,
+    ) -> Option<Vec<u8>> {
+        use std::io::Read;
+        use rustls::ClientConnection;
+        use rustls::StreamOwned;
+
+        debug!("DNS (DoH GET fallback) -> {}", url);
+
+        let tcp = std::net::TcpStream::connect_timeout(&addr, Duration::from_secs(5)).ok()?;
+        #[cfg(unix)]
+        {
+            let _ = protector.protect_socket(tcp.as_raw_fd());
+        }
+        tcp.set_read_timeout(Some(Duration::from_secs(5))).ok()?;
+        tcp.set_write_timeout(Some(Duration::from_secs(5))).ok()?;
+
+        let server_name = create_server_name(host)?;
+        let conn = ClientConnection::new(self.tls_config.clone(), server_name).ok()?;
+        let mut tls = StreamOwned::new(conn, tcp);
+
+        let dns_param = base64url_encode(query);
+        let http_request = format!(
+            "GET /{}?dns={} HTTP/1.1\r\n\
+             Host: {}\r\n\
+             Accept: application/dns-message\r\n\
+             Connection: close\r\n\
+             User-Agent: Fityah/1.0\r\n\
+             \r\n",
+            path, dns_param, host
+        );
+
+        use std::io::Write;
+        tls.write_all(http_request.as_bytes()).ok()?;
+        tls.flush().ok()?;
+
+        let mut buf = Vec::new();
+        tls.read_to_end(&mut buf).ok()?;
+        parse_http_body(&buf)
+    }
+
+    fn resolve_dot(
+        &self,
+        query: &[u8],
+        address: &str,
+        protector: &dyn SocketProtector,
+    ) -> Option<Vec<u8>> {
+        use std::io::Write;
+        use std::net::ToSocketAddrs;
+        use rustls::ClientConnection;
+        use rustls::StreamOwned;
+
+        info!("DNS (DoT) -> {}", address);
+
+        let addr = (address, 853).to_socket_addrs().ok()?.next()?;
+
+        let tcp = std::net::TcpStream::connect_timeout(&addr, Duration::from_secs(5)).ok()?;
+        #[cfg(unix)]
+        {
+            let _ = protector.protect_socket(tcp.as_raw_fd());
+        }
+        tcp.set_read_timeout(Some(Duration::from_secs(5))).ok()?;
+        tcp.set_write_timeout(Some(Duration::from_secs(5))).ok()?;
+
+        let server_name = create_server_name(address)?;
+        let conn = ClientConnection::new(self.tls_config.clone(), server_name).ok()?;
+        let mut tls = StreamOwned::new(conn, tcp);
+
+        // DoT uses a 2-byte length prefix (RFC 7858)
+        let len_prefix = (query.len() as u16).to_be_bytes();
+        tls.write_all(&len_prefix).ok()?;
+        tls.write_all(query).ok()?;
+        tls.flush().ok()?;
+
+        // Read response length prefix
+        let mut len_buf = [0u8; 2];
+        read_exact_buf(&mut tls, &mut len_buf).ok()?;
+        let resp_len = u16::from_be_bytes(len_buf) as usize;
+
+        // Read response payload
+        let mut buf = vec![0u8; resp_len];
+        read_exact_buf(&mut tls, &mut buf).ok()?;
+        Some(buf)
+    }
+}
+
+fn read_exact_buf<R: std::io::Read>(reader: &mut R, buf: &mut [u8]) -> std::io::Result<()> {
+    reader.read_exact(buf)
+}
+
 #[derive(uniffi::Object)]
 pub struct VpnController {
     stop_signal: Arc<AtomicBool>,
+    resolver: DnsResolver,
+    reel_count: Arc<AtomicU64>,
 }
 
 #[uniffi::export]
@@ -42,7 +487,47 @@ impl VpnController {
     pub fn new() -> Arc<Self> {
         Arc::new(VpnController {
             stop_signal: Arc::new(AtomicBool::new(false)),
+            resolver: DnsResolver::new(),
+            reel_count: Arc::new(AtomicU64::new(0)),
         })
+    }
+
+    pub fn resolve_dns(
+        &self,
+        query: Vec<u8>,
+        servers: Vec<DnsServer>,
+        protector: Box<dyn SocketProtector>,
+    ) -> Option<Vec<u8>> {
+        debug!(
+            "resolve_dns called with query ({} bytes), {} servers",
+            query.len(),
+            servers.len()
+        );
+
+        if let Some(domain) = parse_dns_query_name(&query) {
+            if is_reel_domain(&domain) {
+                let count = self.reel_count.fetch_add(1, Ordering::SeqCst) + 1;
+                info!("Reel domain detected: {} (count: {})", domain, count);
+            }
+        }
+
+        let result = self.resolver.resolve(&query, &servers, &*protector);
+        if result.is_none() {
+            warn!(
+                "DNS resolution failed for query ({} bytes) across all servers",
+                query.len()
+            );
+        }
+        result
+    }
+
+    pub fn get_reel_count(&self) -> u64 {
+        self.reel_count.load(Ordering::SeqCst)
+    }
+
+    pub fn reset_reel_count(&self) {
+        self.reel_count.store(0, Ordering::SeqCst);
+        info!("Reel count reset");
     }
 
     #[allow(unused_variables)]

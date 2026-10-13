@@ -37,7 +37,6 @@ class DnsVpnService : VpnService() {
     private lateinit var dataStoreManager: DataStoreManager
     
     private var vpnController: uniffi.fityah_rust.VpnController? = null
-    private var dnsProxy: UdpDnsProxy? = null
     private var dnsHandler: DnsPacketHandler? = null
 
     private val dnsCallback = object : uniffi.fityah_rust.DnsCallback {
@@ -187,10 +186,7 @@ class DnsVpnService : VpnService() {
                         return@withLock
                     }
 
-                    // Initialize persistent proxy and handler
-                    val proxy = UdpDnsProxy(this@DnsVpnService)
-                    dnsProxy = proxy
-                    dnsHandler = DnsPacketHandler(applicationContext, proxy, config)
+                    uniffi.fityah_rust.rustInitLogger()
                     
                     val pfd = establishVpn()
                     if (pfd == null) {
@@ -199,12 +195,12 @@ class DnsVpnService : VpnService() {
                     }
                     vpnInterface = pfd
                     
-                    uniffi.fityah_rust.rustInitLogger()
-                    
                     val controller = uniffi.fityah_rust.VpnController()
+                    vpnController = controller
+                    dnsHandler = DnsPacketHandler(applicationContext, controller, socketProtector, config)
+                    
                     // Task: Pass raw FD but Java keeps ownership of PFD object
                     controller.start(pfd.fd, dnsCallback, socketProtector)
-                    vpnController = controller
                     
                     // Task: Force Private DNS OFF via Shizuku if enabled in settings
                     if (config.lockPrivateDns) {
@@ -339,9 +335,6 @@ class DnsVpnService : VpnService() {
         vpnController = null
         vpnJob?.cancel()
         vpnJob = null
-
-        dnsProxy?.close()
-        dnsProxy = null
         dnsHandler = null
 
         try {
