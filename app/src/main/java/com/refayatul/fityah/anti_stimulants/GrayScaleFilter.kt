@@ -35,6 +35,15 @@ class GrayScaleFilter : BaseBlocker() {
     private val grayscaleControl = GrayscaleControl()
     private var ignoredGrayScalePackages: List<String> = listOf()
     private var lastPackageName: String? = null
+
+    /**
+     * True only while Fityah itself turned grayscale ON.
+     * We must never disable grayscale that the user enabled manually
+     * (e.g. Settings > Colour correction > Greyscale). Without this,
+     * switching to any app that is not in a grayscale group force-disabled
+     * the user's global setting.
+     */
+    private var grayscaleAppliedByUs: Boolean = false
     private var settingsJob: Job? = null
     private val handler = Handler(Looper.getMainLooper())
 
@@ -90,9 +99,15 @@ class GrayScaleFilter : BaseBlocker() {
         if (shouldGrayscale) {
             Log.d("GrayScaleFilter", "Enabling monochrome for $currentPackageName")
             grayscaleControl.enableGrayscale(service)
-        } else {
-            Log.d("GrayScaleFilter", "Disabling monochrome for $currentPackageName")
+            grayscaleAppliedByUs = true
+        } else if (grayscaleAppliedByUs) {
+            // Only revert what WE applied. If the user turned grayscale on
+            // manually (global colour correction), leave it alone.
+            Log.d("GrayScaleFilter", "Disabling monochrome for $currentPackageName (applied by Fityah)")
             grayscaleControl.disableGrayscale(service)
+            grayscaleAppliedByUs = false
+        } else {
+            Log.d("GrayScaleFilter", "Leaving user's own grayscale setting untouched for $currentPackageName")
         }
     }
 
