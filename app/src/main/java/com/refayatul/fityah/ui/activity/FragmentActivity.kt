@@ -45,7 +45,10 @@ import android.os.Build
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.launch
+import com.refayatul.fityah.utils.UpdateChecker
 
 class FragmentActivity : AppCompatActivity() {
 
@@ -77,6 +80,12 @@ class FragmentActivity : AppCompatActivity() {
 
         maybeShowTermsConsent()
         maybeShowWhatsNew()
+
+        lifecycleScope.launch {
+            UpdateChecker.check(this@FragmentActivity)?.let { info ->
+                UpdateChecker.notify(this@FragmentActivity, info)
+            }
+        }
 
         val bottomNav = findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.bottom_nav)
 
