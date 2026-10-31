@@ -46,6 +46,13 @@ class InfoFragment : Fragment() {
         setupUsageTrackingSettings()
         setupClickListeners()
         LanguageUtils.bindLanguageSelector(binding.languageSelector, binding.textCurrentLanguage)
+
+        // Removed sections: about/hero, donate, join, github, browser extension
+        binding.cardHero.visibility = View.GONE
+        binding.cardDonate.visibility = View.GONE
+        binding.cardDiscord.visibility = View.GONE
+        binding.cardGithub.visibility = View.GONE
+        binding.cardBrowserExtension.visibility = View.GONE
     }
 
     private fun setupUsageTrackingSettings() {
@@ -122,33 +129,12 @@ class InfoFragment : Fragment() {
             openUrl("https://fityah.app/docs/")
         }
 
-        binding.btnSupport.setOnClickListener {
-            openUrl("https://github.com/Refayatul")
-        }
-
-        binding.btnDonate.setOnClickListener {
-            openUrl("https://fityah.app/donate")
-        }
-
         binding.btnShare.setOnClickListener {
             shareProject()
         }
 
-        binding.cardDiscord.setOnClickListener {
-            // Replace with actual Discord invite link
-            openUrl("https://discord.com/invite/Vs9mwUtuCN")
-        }
-
         binding.cardInstagram.setOnClickListener {
             openUrl("https://instagram.com/fityah.app")
-        }
-
-        binding.cardGithub.setOnClickListener {
-            openUrl("https://github.com/Refayatul/Fityah")
-        }
-
-        binding.cardBrowserExtension.setOnClickListener {
-            openUrl("https://github.com/Refayatul/fityah-extension")
         }
 
         binding.btnActionCrashLogs.setOnClickListener {
