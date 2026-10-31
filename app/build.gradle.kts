@@ -4,6 +4,7 @@ import com.android.build.api.variant.ApplicationVariant
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.compose.compiler)
 }
 
 // The fastlane changelogs are the single source of truth: the store listings, the
@@ -44,6 +45,10 @@ android {
     namespace = "com.refayatul.fityah"
     compileSdk = 37
     ndkVersion = "30.0.15729638"
+
+    buildFeatures {
+        compose = true
+    }
     flavorDimensions += "version"
 
     lint {
@@ -173,6 +178,15 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
+
+    // Compose (for Halloween seasonal background ported from MorpheApp/morphe-manager)
+    implementation(platform(libs.compose.bom))
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.preview)
+    debugImplementation(libs.compose.ui.tooling)
+    implementation(libs.compose.material3)
+    implementation(libs.activity.compose)
+    implementation(libs.lifecycle.runtime.compose)
 
     // QR Scanner & Generator
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
