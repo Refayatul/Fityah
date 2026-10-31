@@ -63,6 +63,11 @@
         </activity>
 
         <activity
+            android:name=".ui.halloween.HalloweenActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Fityah" />
+
+        <activity
             android:name=".ui.activity.SelectAppsActivity"
             android:exported="false" />
 
